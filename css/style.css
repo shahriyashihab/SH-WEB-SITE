@@ -441,8 +441,8 @@ img{max-width:100%;display:block}
 
 /* ================= MOBILE POLISH (front-end) ================= */
 @media(max-width:560px){
-  /* comfortable tap targets for primary actions (layout-safe only) */
+  /* comfortable tap targets only; layout/padding kept as before */
   .menu-btn,.mm-close{min-width:44px;min-height:44px}
-  .mm-link{padding:14px 16px}
+  .mm-link{padding-top:14px;padding-bottom:14px}
 }
 

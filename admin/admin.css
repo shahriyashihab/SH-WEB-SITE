@@ -147,12 +147,7 @@ button{font:inherit;cursor:pointer}
 
 /* ================= ADMIN MOBILE POLISH (phone) ================= */
 @media(max-width:560px){
-  /* comfortable tap targets only; layout kept unchanged */
-  .sb-link{padding:12px 13px}
-  .btn{padding:10px 15px}
-  .btn-sm{padding:9px 12px}
+  /* only enlarge the modal close tap target; nothing else changed */
   .modal-close{width:40px;height:40px;font-size:1.6rem;display:grid;place-items:center}
-  .modal-bg{padding:16px 12px}
-  .modal{width:100%}
 }
 
