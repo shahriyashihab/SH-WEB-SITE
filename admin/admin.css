@@ -147,26 +147,12 @@ button{font:inherit;cursor:pointer}
 
 /* ================= ADMIN MOBILE POLISH (phone) ================= */
 @media(max-width:560px){
-  /* comfortable tap targets */
-  .sb-link{padding:13px 14px;font-size:.95rem}
-  .btn{padding:11px 16px;font-size:.9rem}
-  .btn-sm{padding:10px 14px;font-size:.84rem}
-  .modal-close{width:44px;height:44px;font-size:1.8rem;display:grid;place-items:center}
-  /* modal fits a small screen and scrolls; footer buttons full width */
-  .modal-bg{padding:14px 10px}
-  .modal{width:100%;border-radius:14px}
-  .modal-body{padding:18px 16px;max-height:66vh}
-  .modal-head{padding:14px 16px}
-  .modal-foot{padding:12px 16px;flex-wrap:wrap}
-  .modal-foot .btn{flex:1 1 auto;min-width:120px}
-  /* forms: 16px keeps iOS from zooming on focus */
-  .fld input,.fld select,.fld textarea{font-size:16px}
-  .form-grid.two{gap:14px}
-  /* list rows stack neatly */
-  .row-item{padding:12px}
-  .row-actions{width:100%;margin-top:8px}
-  .row-actions .btn{flex:1 1 auto}
-  /* page header wraps */
-  .page-h{flex-direction:column;align-items:flex-start}
-  .page-h .btn{width:100%}
+  /* comfortable tap targets only; layout kept unchanged */
+  .sb-link{padding:12px 13px}
+  .btn{padding:10px 15px}
+  .btn-sm{padding:9px 12px}
+  .modal-close{width:40px;height:40px;font-size:1.6rem;display:grid;place-items:center}
+  .modal-bg{padding:16px 12px}
+  .modal{width:100%}
 }
+
