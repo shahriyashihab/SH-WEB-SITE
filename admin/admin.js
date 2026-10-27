@@ -33,7 +33,7 @@
     try { sessionStorage.removeItem(SESSION); } catch (e) {}
     location.reload();
   });
-  $("viewSite").addEventListener("click", function () { window.open("../index.html", "_blank"); });
+  $("viewSite").addEventListener("click", function () { window.open("../", "_blank"); });
 
   function showApp() {
     var u = currentUser();

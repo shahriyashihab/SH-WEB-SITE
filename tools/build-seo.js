@@ -29,21 +29,21 @@ function header() {
   return `<div class="topbar">
   <div class="container">
     <span>&#128222; +880 1958-633202 &nbsp;|&nbsp; &#9993; info@sprint.fast-page.org</span>
-    <div class="tb-right"><a href="../company-profile.html">Company Profile</a><a href="../products.html">Products</a><a href="../order.html">Order Now</a></div>
+    <div class="tb-right"><a href="../company-profile">Company Profile</a><a href="../products">Products</a><a href="../order">Order Now</a></div>
   </div>
 </div>
 
 <header class="site-header">
   <div class="container header-inner">
-    <a href="../index.html" class="logo"><img src="../assets/img/logo.svg" alt="Shahriar LLC" style="height:38px;width:auto" /></a>
+    <a href="../" class="logo"><img src="../assets/img/logo.svg" alt="Shahriar LLC" style="height:38px;width:auto" /></a>
     <nav class="main-nav" aria-label="Main navigation">
-      <a class="nav-link" href="../index.html">Home</a>
-      <div class="has-drop"><a class="nav-link" href="../about.html">About Us &#9662;</a><div class="drop"><a href="../ceo.html">CEO Profile</a><a href="../team.html">Management Team</a><a href="../about.html">About Us</a><a href="../company-profile.html">Company Profile</a></div></div>
-      <a class="nav-link" href="../services.html">Services</a>
-      <a class="nav-link" href="../products.html">Products</a>
-      <a class="nav-link" href="../portfolio.html">Portfolio</a>
-      <a class="nav-link" href="../clients.html">Clients</a>
-      <div class="nav-cta"><a href="../order.html" class="btn btn-primary btn-sm">Order Now</a></div>
+      <a class="nav-link" href="../">Home</a>
+      <div class="has-drop"><a class="nav-link" href="../about">About Us &#9662;</a><div class="drop"><a href="../ceo">CEO Profile</a><a href="../team">Management Team</a><a href="../about">About Us</a><a href="../company-profile">Company Profile</a></div></div>
+      <a class="nav-link" href="../services">Services</a>
+      <a class="nav-link" href="../products">Products</a>
+      <a class="nav-link" href="../portfolio">Portfolio</a>
+      <a class="nav-link" href="../clients">Clients</a>
+      <div class="nav-cta"><a href="../order" class="btn btn-primary btn-sm">Order Now</a></div>
     </nav>
     <button class="menu-btn" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
   </div>
@@ -52,16 +52,16 @@ function header() {
 <div class="mm-overlay" id="mmOverlay"></div>
 <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
   <div class="mm-head"><span class="logo"><img src="../assets/img/logo.svg" alt="Shahriar LLC" style="height:34px;width:auto" /></span><button class="mm-close" id="mmClose" aria-label="Close">&times;</button></div>
-  <a class="mm-link" href="../index.html">Home</a>
-  <a class="mm-link" href="../about.html">About Us</a>
-  <a class="mm-link mm-sub" href="../ceo.html">CEO Profile</a>
-  <a class="mm-link mm-sub" href="../team.html">Management Team</a>
-  <a class="mm-link" href="../services.html">Services</a>
-  <a class="mm-link" href="../products.html">Products</a>
-  <a class="mm-link" href="../portfolio.html">Portfolio</a>
-  <a class="mm-link" href="../clients.html">Clients</a>
-  <a class="mm-link" href="../order.html">Order Now</a>
-  <a class="mm-link" href="../contact.html">Contact</a>
+  <a class="mm-link" href="../">Home</a>
+  <a class="mm-link" href="../about">About Us</a>
+  <a class="mm-link mm-sub" href="../ceo">CEO Profile</a>
+  <a class="mm-link mm-sub" href="../team">Management Team</a>
+  <a class="mm-link" href="../services">Services</a>
+  <a class="mm-link" href="../products">Products</a>
+  <a class="mm-link" href="../portfolio">Portfolio</a>
+  <a class="mm-link" href="../clients">Clients</a>
+  <a class="mm-link" href="../order">Order Now</a>
+  <a class="mm-link" href="../contact">Contact</a>
 </nav>`;
 }
 
@@ -73,8 +73,8 @@ function footer() {
       <p>Shahriar LLC is a diversified offshore IT services company established in 2007.</p>
       <div class="social"><a href="#">Fb</a><a href="#">In</a><a href="#">Yt</a></div>
     </div>
-    <div><h4>Company</h4><ul class="footer-links"><li><a href="../about.html">About Us</a></li><li><a href="../ceo.html">CEO Profile</a></li><li><a href="../team.html">Management Team</a></li><li><a href="../company-profile.html">Company Profile</a></li><li><a href="../contact.html">Contact</a></li></ul></div>
-    <div><h4>Services</h4><ul class="footer-links"><li><a href="../services.html">Web Development</a></li><li><a href="../services.html">Enterprise Solutions</a></li><li><a href="../services.html">Mobile Apps</a></li><li><a href="../products.html">Products</a></li><li><a href="../order.html">Order Now</a></li></ul></div>
+    <div><h4>Company</h4><ul class="footer-links"><li><a href="../about">About Us</a></li><li><a href="../ceo">CEO Profile</a></li><li><a href="../team">Management Team</a></li><li><a href="../company-profile">Company Profile</a></li><li><a href="../contact">Contact</a></li></ul></div>
+    <div><h4>Services</h4><ul class="footer-links"><li><a href="../services">Web Development</a></li><li><a href="../services">Enterprise Solutions</a></li><li><a href="../services">Mobile Apps</a></li><li><a href="../products">Products</a></li><li><a href="../order">Order Now</a></li></ul></div>
     <div><h4>Get In Touch</h4><ul class="footer-links"><li>&#128222; +880 1958-633202</li><li>&#9993; info@sprint.fast-page.org</li><li>&#127968; Dhaka, Bangladesh</li></ul></div>
   </div>
   <div class="container footer-bottom"><span>&copy; 2026 Shahriar LLC. All rights reserved.</span><span>Best Software Company in Bangladesh</span></div>
@@ -82,12 +82,12 @@ function footer() {
 }
 
 function page(p) {
-  const url = SITE + "/seo/" + p.slug + ".html";
+  const url = SITE + "/seo/" + p.slug;
   const desc = (p.intro || p.body || "").slice(0, 155);
   const cat = CAT_LABEL[p.cat] || "Info";
   const points = (p.points || []).map(x => `<li>${esc(x)}</li>`).join("");
   const related = PAGES.filter(x => x.cat === p.cat && x.slug !== p.slug).slice(0, 6)
-    .map(x => `<a class="tag" href="${x.slug}.html">${esc(x.h1.replace(/^Best |^How to |^Why /,"").slice(0,42))}</a>`).join("");
+    .map(x => `<a class="tag" href="${x.slug}">${esc(x.h1.replace(/^Best |^How to |^Why /,"").slice(0,42))}</a>`).join("");
 
   const jsonld = JSON.stringify([
     { "@context": "https://schema.org", "@type": "WebPage", name: p.h1, description: desc, url: url,
@@ -98,8 +98,8 @@ function page(p) {
         address: { "@type": "PostalAddress", addressLocality: "Dhaka", addressCountry: "BD" } },
       areaServed: ["Bangladesh", "Worldwide"] },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: SITE + "/index.html" },
-      { "@type": "ListItem", position: 2, name: cat, item: SITE + "/seo/index.html" },
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE + "/" },
+      { "@type": "ListItem", position: 2, name: cat, item: SITE + "/seo/" },
       { "@type": "ListItem", position: 3, name: p.h1, item: url } ] }
   ], null, 0);
 
@@ -135,7 +135,7 @@ ${header()}
   <section class="page-hero">
     <div class="container">
       <h1>${esc(p.h1)}</h1>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="index.html">${esc(cat)}</a> / <span>${esc(p.h1)}</span></div>
+      <div class="breadcrumb"><a href="../">Home</a> / <a href="/">${esc(cat)}</a> / <span>${esc(p.h1)}</span></div>
     </div>
   </section>
 
@@ -156,8 +156,8 @@ ${header()}
           <h3 class="detail-sub">Get started</h3>
           <p class="detail-overview">Tell us your requirement and our team will contact you within 24 hours with a free consultation, timeline and quote. No obligation.</p>
           <p>
-            <a class="btn btn-primary" href="../order.html">Place an Order</a>
-            <a class="btn btn-outline" href="../contact.html" style="margin-left:10px">Contact Us</a>
+            <a class="btn btn-primary" href="../order">Place an Order</a>
+            <a class="btn btn-outline" href="../contact" style="margin-left:10px">Contact Us</a>
           </p>
 
           <h3 class="detail-sub">Related pages</h3>
@@ -168,7 +168,7 @@ ${header()}
           <div class="detail-card">
             <h3>Get a free quote</h3>
             <p class="detail-side-text">Talk to our team about ${esc(p.kw)}. Free consultation, no obligation.</p>
-            <a class="btn btn-primary" style="width:100%" href="../order.html">Order Now</a>
+            <a class="btn btn-primary" style="width:100%" href="../order">Order Now</a>
             <a class="btn btn-outline" style="width:100%;margin-top:10px" href="tel:+8801958633202">&#128222; +880 1958-633202</a>
           </div>
           <div class="detail-card">
@@ -190,7 +190,7 @@ ${header()}
     <div class="container">
       <h2>Ready to start?</h2>
       <p>Share your requirement and we'll respond within 24 hours.</p>
-      <a href="../order.html" class="btn btn-accent btn-lg">Place an Order</a>
+      <a href="../order" class="btn btn-accent btn-lg">Place an Order</a>
     </div>
   </section>
 </main>
@@ -213,7 +213,7 @@ PAGES.forEach(p => {
   n++;
 });
 
-// ---- generate the SEO directory index (/seo/index.html) ----
+// ---- generate the SEO directory index (/seo/) ----
 (function buildIndex() {
   const groups = {};
   PAGES.forEach(p => { (groups[p.cat] = groups[p.cat] || []).push(p); });
@@ -221,7 +221,7 @@ PAGES.forEach(p => {
   Object.keys(groups).forEach(cat => {
     sections += `<h2 class="section-head" style="margin:34px 0 14px;font-size:1.4rem">${CAT_LABEL[cat] || cat} (${groups[cat].length})</h2><div class="grid grid-3">`;
     groups[cat].forEach(p => {
-      sections += `<a class="card" style="text-decoration:none" href="${p.slug}.html"><h3>${esc(p.h1)}</h3><p>${esc(p.intro)}</p><span class="more">Read more &rarr;</span></a>`;
+      sections += `<a class="card" style="text-decoration:none" href="${p.slug}"><h3>${esc(p.h1)}</h3><p>${esc(p.intro)}</p><span class="more">Read more &rarr;</span></a>`;
     });
     sections += `</div>`;
   });
@@ -232,7 +232,7 @@ PAGES.forEach(p => {
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Resources &amp; Solutions | Shahriar LLC</title>
 <meta name="description" content="Guides, solutions, products, industries and locations served by Shahriar LLC — a software company in Bangladesh since 2007." />
-<link rel="canonical" href="${SITE}/seo/index.html" />
+<link rel="canonical" href="${SITE}/seo/" />
 <meta name="robots" content="index, follow" />
 <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
 <link rel="stylesheet" href="../css/style.css" />
@@ -240,7 +240,7 @@ PAGES.forEach(p => {
 <body>
 ${header()}
 <main>
-  <section class="page-hero"><div class="container"><h1>Resources &amp; Solutions</h1><div class="breadcrumb"><a href="../index.html">Home</a> / Resources</div></div></section>
+  <section class="page-hero"><div class="container"><h1>Resources &amp; Solutions</h1><div class="breadcrumb"><a href="../">Home</a> / Resources</div></div></section>
   <section class="section"><div class="container">
     <div class="section-head"><span class="eyebrow">Explore</span><h2>${PAGES.length} pages about our services, products and industries</h2><p>Find the solution, product or guide that fits your business.</p></div>
     ${sections}
@@ -250,16 +250,16 @@ ${footer()}
 </body>
 </html>
 `;
-  fs.writeFileSync(path.join(OUT, "index.html"), index, "utf8");
+  fs.writeFileSync(path.join(OUT, "/"), index, "utf8");
 })();
 
 // ---- generate the mega sitemap ----
 (function buildSitemap() {
-  const CORE = ["", "services.html", "products.html", "contact.html", "order.html", "about.html",
-    "ceo.html", "team.html", "portfolio.html", "clients.html", "company-profile.html"];
+  const CORE = ["", "services", "products", "contact", "order", "about",
+    "ceo", "team", "portfolio", "clients", "company-profile"];
   let urls = CORE.map(u => `  <url><loc>${SITE}/${u}</loc><lastmod>2026-10-25</lastmod><changefreq>weekly</changefreq><priority>${u === "" ? "1.0" : "0.8"}</priority></url>`).join("\n");
-  urls += "\n" + PAGES.map(p => `  <url><loc>${SITE}/seo/${p.slug}.html</loc><lastmod>2026-10-25</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>`).join("\n");
-  urls += `\n  <url><loc>${SITE}/seo/index.html</loc><lastmod>2026-10-25</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>`;
+  urls += "\n" + PAGES.map(p => `  <url><loc>${SITE}/seo/${p.slug}</loc><lastmod>2026-10-25</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>`).join("\n");
+  urls += `\n  <url><loc>${SITE}/seo/</loc><lastmod>2026-10-25</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>`;
   const sm = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
   fs.writeFileSync(path.join(ROOT, "sitemap.xml"), sm, "utf8");
 })();

@@ -126,7 +126,7 @@
   function svcCard(s, i) {
     var delay = (i % 3) * 110;
     var slug = s[4] || "";
-    var link = slug ? "service.html?item=" + encodeURIComponent(slug) : "services.html";
+    var link = slug ? "service?item=" + encodeURIComponent(slug) : "services";
     var img = s[2] || "img/svc-web.jpg";
     var src = /^(assets\/|data:|http)/.test(img) ? img : ("assets/" + img);
     return '<article class="service-card reveal" style="--d:' + delay + 'ms">' +
@@ -148,7 +148,7 @@
       $("homeProducts").innerHTML = productsData().slice(0, 6).map(function (p, i) {
         var src = /^(assets\/|data:|http)/.test(p.img || "") ? p.img : ("assets/" + p.img);
         return '<article class="product-card reveal" style="--d:' + ((i % 3) * 110) + 'ms">' +
-          '<a href="detail.html?item=' + p.slug + '" style="display:contents">' +
+          '<a href="detail?item=' + p.slug + '" style="display:contents">' +
           '<div class="pc-logo">' + esc(p.logo) + '</div>' +
           '<h3 class="pc-tag">' + esc(p.name) + '</h3>' +
           '<p class="pc-sub">' + esc(p.tag) + '</p>' +
@@ -156,13 +156,13 @@
           '</a>' +
           '<div class="pc-actions">' +
           '<a href="tel:' + livePhoneDial() + '" class="btn-product btn-call">&#128222; Call Now</a>' +
-          '<a href="detail.html?item=' + p.slug + '" class="btn-product btn-demo">&#128433; Try Demo</a>' +
+          '<a href="detail?item=' + p.slug + '" class="btn-product btn-demo">&#128433; Try Demo</a>' +
           '</div></article>';
       }).join("");
     }
     if ($("homeIndustries")) {
       $("homeIndustries").innerHTML = INDUSTRIES.slice(0, 8).map(function (n, i) {
-        return '<a class="ind reveal" style="--d:' + (i * 80) + 'ms" href="clients.html"><span class="dot"></span>' + esc(n) + '</a>';
+        return '<a class="ind reveal" style="--d:' + (i * 80) + 'ms" href="clients"><span class="dot"></span>' + esc(n) + '</a>';
       }).join("");
     }
     if ($("homeTech")) {
@@ -189,7 +189,7 @@
   function renderClientsPage() {
     if ($("clientGrid")) {
       $("clientGrid").innerHTML = INDUSTRIES.map(function (n, i) {
-        return '<a class="ind reveal" style="--d:' + ((i % 4) * 80) + 'ms" href="portfolio.html"><span class="dot"></span>' + esc(n) + '</a>';
+        return '<a class="ind reveal" style="--d:' + ((i % 4) * 80) + 'ms" href="portfolio"><span class="dot"></span>' + esc(n) + '</a>';
       }).join("");
     }
   }
@@ -337,6 +337,24 @@
     });
   }
 
+  /* Keep JSON-LD "telephone" values at the live phone number. */
+  function syncSchemaPhone(phone) {
+    if (!phone) return;
+    var dial = String(phone).replace(/[^\d+]/g, "");
+    document.querySelectorAll('script[type="application/ld+json"]').forEach(function (sc) {
+      try {
+        var obj = JSON.parse(sc.textContent);
+        var changed = false;
+        (function walk(node) {
+          if (!node || typeof node !== "object") return;
+          if (typeof node.telephone === "string") { node.telephone = dial; changed = true; }
+          Object.keys(node).forEach(function (k) { walk(node[k]); });
+        })(obj);
+        if (changed) sc.textContent = JSON.stringify(obj);
+      } catch (e) {}
+    });
+  }
+
   /* Fill any element that opts in with data-sh="phone|email|address|company".
      Optional data-sh-href="tel:|mailto:" turns it into a working link. */
   function syncDataAttrs(s) {
@@ -409,7 +427,7 @@
   function renderTeamGrids(team) {
     var list = (team && team.length) ? team : teamData();
     var html = list.map(function (m, i) {
-      return '<a class="member reveal in" href="profile.html?m=' + esc(slugOf(m)) + '" style="--d:' + ((i % 4) * 90) + 'ms;text-decoration:none">' +
+      return '<a class="member reveal in" href="profile?m=' + esc(slugOf(m)) + '" style="--d:' + ((i % 4) * 90) + 'ms;text-decoration:none">' +
         '<div class="member-photo"><img src="' + esc(imgSrc(m.img)) + '" alt="' + esc(m.name || "") + '" loading="lazy"></div>' +
         '<div class="mb"><h3>' + esc(m.name || "") + '</h3><span>' + esc(m.role || "") + '</span></div></a>';
     }).join("");
@@ -427,10 +445,21 @@
       swapField("company", s.company);
     }
 
-    /* ---- phone: literal text + tel: links ---- */
+    /* ---- phone: literal text + tel: links + schema telephone ---- */
     if (s.phone) {
       swapField("phone", s.phone);
+      /* the spaceless form (+8801958... / 01863...) also appears in tel:
+         links and JSON-LD; swap it too so a phone change never leaves a
+         stale number behind. */
+      var spaced = SEED.phone;
+      var bare = SEED.phone.replace(/[^\d+]/g, "");
+      var curBare = (CURRENT.phone || "").replace(/[^\d+]/g, "");
+      var newBare = String(s.phone).replace(/[^\d+]/g, "");
+      [bare, curBare].forEach(function (oldBare) {
+        if (oldBare && oldBare !== newBare) replaceText(oldBare, String(s.phone));
+      });
       syncTelLinks(s.phone);
+      syncSchemaPhone(s.phone);
     }
 
     /* ---- email: literal text + mailto: links ---- */

@@ -39,9 +39,13 @@
   function abs(p) { return /^https?:/.test(p) ? p : SITE + "/" + String(p || "").replace(/^\//, ""); }
   function qs(name) { return new URLSearchParams(location.search).get(name); }
 
-  /* ---- current page identity ---- */
-  var file = location.pathname.split("/").pop() || "index.html";
-  var canonical = abs(file + (location.search || ""));
+  /* ---- current page identity ----
+     With clean URLs the path has no ".html" (e.g. /services). Normalise
+     the file name to a bare slug so the keyword/schema switches below
+     keep working for both /services and /services.html. */
+  var rawFile = location.pathname.split("/").pop() || "index";
+  var file = rawFile.replace(/\.html$/i, "") || "index";
+  var canonical = SITE + "/" + (file === "index" ? "" : file) + (location.search || "");
   var title = document.title;
   var desc = (document.querySelector('meta[name="description"]') || {}).content || "";
   var heroImg = abs("assets/img/og-cover.jpg");
@@ -74,21 +78,21 @@
 
   /* ---- site-level keyword groups (per page) ---- */
   var KEYWORDS = {
-    "index.html": "software company in Bangladesh, best software company Dhaka, custom software development Bangladesh, ERP software, web development company Bangladesh",
-    "services.html": "software development services Bangladesh, web design Dhaka, ERP CRM POS software, mobile app development Bangladesh",
-    "products.html": "ready made software Bangladesh, ERP software price, HR payroll software, school management software, POS software Bangladesh",
-    "about.html": "about Shahriar LLC, offshore IT company Bangladesh, software company since 2007",
-    "portfolio.html": "software portfolio Bangladesh, ERP project case study, school management project",
-    "clients.html": "software clients Bangladesh, government software vendor, RMG software, hospital software",
-    "contact.html": "contact software company Dhaka, get software quote Bangladesh",
-    "company-profile.html": "Shahriar LLC company profile, IT company Dhaka profile",
-    "ceo.html": "Shahriar LLC CEO, Md Mofakhkharul Islam, software company leadership",
-    "team.html": "Shahriar LLC management team, software engineers Bangladesh"
+    "index": "software company in Bangladesh, best software company Dhaka, custom software development Bangladesh, ERP software, web development company Bangladesh",
+    "services": "software development services Bangladesh, web design Dhaka, ERP CRM POS software, mobile app development Bangladesh",
+    "products": "ready made software Bangladesh, ERP software price, HR payroll software, school management software, POS software Bangladesh",
+    "about": "about Shahriar LLC, offshore IT company Bangladesh, software company since 2007",
+    "portfolio": "software portfolio Bangladesh, ERP project case study, school management project",
+    "clients": "software clients Bangladesh, government software vendor, RMG software, hospital software",
+    "contact": "contact software company Dhaka, get software quote Bangladesh",
+    "company-profile": "Shahriar LLC company profile, IT company Dhaka profile",
+    "ceo": "Shahriar LLC CEO, Md Mofakhkharul Islam, software company leadership",
+    "team": "Shahriar LLC management team, software engineers Bangladesh"
   };
   if (KEYWORDS[file]) meta("name", "keywords", KEYWORDS[file]);
 
   /* ---- breadcrumb trail from the visible .breadcrumb ---- */
-  var crumbs = [{ name: "Home", url: SITE + "/index.html" }];
+  var crumbs = [{ name: "Home", url: SITE + "/" }];
   document.querySelectorAll(".breadcrumb a, .breadcrumb span").forEach(function (el) {
     var txt = (el.textContent || "").trim();
     if (!txt || /^\//.test(txt)) return;
@@ -136,7 +140,7 @@
     publisher: { "@id": SITE + "/#organization" },
     potentialAction: {
       "@type": "SearchAction",
-      target: SITE + "/products.html?q={search_term_string}",
+      target: SITE + "/products?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   };
@@ -165,7 +169,7 @@
   }
 
   /* ---- detail.html : Service or Product schema ---- */
-  if (file === "detail.html") {
+  if (file === "detail") {
     var name = ($("#dHeading") || {}).textContent || title;
     var type = ($("#dType") || {}).textContent || "Service";
     var overview = ($("#dOverview") || {}).textContent || desc;
@@ -184,7 +188,7 @@
   }
 
   /* ---- profile.html : Person schema ---- */
-  if (file === "profile.html") {
+  if (file === "profile") {
     jsonld({
       "@context": "https://schema.org",
       "@type": "Person",
@@ -197,7 +201,7 @@
   }
 
   /* ---- home page : FAQ schema (buys rich results for free) ---- */
-  if (file === "index.html") {
+  if (file === "index") {
     jsonld({
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -207,7 +211,7 @@
         { "@type": "Question", name: "What software products does Shahriar LLC sell?",
           acceptedAnswer: { "@type": "Answer", text: "Sheba ERP, HR Sheba, Smart Educare, Gym Master, CRM Suite, Remit Sheba and more ready-made software, plus fully custom development." } },
         { "@type": "Question", name: "How do I get a free quote?",
-          acceptedAnswer: { "@type": "Answer", text: "Call " + (CO.phone || "") + " or use the contact form on contact.html for a free consultation and quote." } }
+          acceptedAnswer: { "@type": "Answer", text: "Call " + (CO.phone || "") + " or use the contact form on the Contact page for a free consultation and quote." } }
       ]
     });
   }
