@@ -74,9 +74,16 @@
         <p id="svcIntro">Pick the option that matches your goal and see full details, features and pricing.</p>
       </div>
       <div class="grid grid-3" id="subList"></div>
-      <div class="center" id="subEmpty" style="display:none">
-        <p style="color:var(--muted);margin:20px 0 24px">Detailed options for this service are coming soon.</p>
-        <a href="contact" class="btn btn-primary">Talk to an Expert</a>
+      <div class="coming-soon" id="subEmpty" style="display:none">
+        <div class="cs-glow"></div>
+        <svg class="cs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M12 7v5l3 2"></path>
+        </svg>
+        <p class="cs-eyebrow">Stay tuned</p>
+        <h3 class="cs-title">Coming&nbsp;Soon</h3>
+        <p class="cs-text">Detailed options for this service are on the way. In the meantime, talk to our team and we&rsquo;ll build exactly what you need.</p>
+        <a href="contact" class="btn btn-primary btn-lg">Talk to an Expert</a>
       </div>
     </div>
   </section>
@@ -121,24 +128,11 @@
     return /^(assets\/|data:|http|\.\.\/|\/)/.test(img) ? img : ("assets/" + img);
   }
 
-  /* Fallback sub-services from CATALOG when the admin has none yet.
-     The id is namespaced as "parent:slug" so detail can resolve it
-     back to the exact catalog item. */
-  function fallbackSubs() {
-    var cat = (window.CATALOG || {})[parent];
-    if (cat && cat.items && cat.items.length) {
-      return cat.items.map(function (it, i) {
-        return { id: parent + ":" + (it.slug || i), slug: it.slug, title: it.title, tagline: it.tagline, img: it.img || cat.img, overview: it.overview, features: it.features, includes: it.includes, price: it.price, delivery: it.delivery };
-      });
-    }
-    return [];
-  }
-
+  /* Sub-services come only from the store (admin-editable).
+     When the admin has none, the section shows a styled "Coming Soon". */
   function subsFor() {
     var live = (window.SH && SH.list("subservices")) || [];
-    var mine = live.filter(function (s) { return s.parent === parent; });
-    if (mine.length) return mine;
-    return fallbackSubs();
+    return live.filter(function (s) { return s.parent === parent; });
   }
 
   function render() {
