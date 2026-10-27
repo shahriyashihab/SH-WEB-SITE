@@ -46,7 +46,7 @@
   }
 
   /* ---------- navigation ---------- */
-  var PAGES = { dashboard: "Dashboard", company: "Company Settings", hero: "Home / Hero", services: "Services", subservices: "Sub-Services", products: "Products", team: "Management Team", ceo: "CEO Profile", admins: "Admin Users", orders: "Orders / Leads" };
+  var PAGES = { dashboard: "Dashboard", company: "Company Settings", hero: "Home / Hero", services: "Services", subservices: "Sub-Services", products: "Products", team: "Management Team", ceo: "CEO Profile", slides: "Slide Bar", admins: "Admin Users", orders: "Orders / Leads" };
   function goto(page) {
     document.querySelectorAll(".sb-link").forEach(function (l) { l.classList.toggle("active", l.getAttribute("data-page") === page); });
     document.querySelectorAll(".page").forEach(function (p) { p.classList.toggle("active", p.id === "page-" + page); });
@@ -56,6 +56,7 @@
     if (page === "services") renderServicesList();
     if (page === "subservices") renderSubServicesList();
     if (page === "products") renderProductsList();
+    if (page === "slides") renderSlidesList();
     if (page === "team") renderTeamList();
     if (page === "admins") renderAdminsList();
     if (page === "orders") renderOrdersList();
@@ -74,6 +75,7 @@
   function refreshCounts() {
     $("cServices").textContent = SH.list("services").length;
     if ($("cSub")) $("cSub").textContent = SH.list("subservices").length;
+    if ($("cSlides")) $("cSlides").textContent = SH.list("slides").length;
     $("cProducts").textContent = SH.list("products").length;
     $("cTeam").textContent = SH.list("team").length;
     $("cAdmins").textContent = SH.list("admins").length;
@@ -342,6 +344,44 @@
     }, 30);
   }
 
+  /* ---------- SLIDE BAR (hero slider images) ---------- */
+  function renderSlidesList() {
+    var list = SH.list("slides");
+    if (!list.length) { $("slidesList").innerHTML = '<p class="empty">No images yet. Click "Add Image" to add one, or several to create a slideshow.</p>'; return; }
+    $("slidesList").innerHTML = list.map(function (s) {
+      var thumb = s.img ? '<img src="../' + esc(srcPath(s.img)) + '" alt="">' : '<div class="thumb-fallback">IMG</div>';
+      return '<div class="row-item">' + thumb +
+        '<div class="info"><b>' + esc(s.alt || "Slide image") + '</b><span>' + esc(s.img ? String(s.img).slice(0, 48) : "") + '</span></div>' +
+        '<div class="row-actions"><button class="btn btn-outline btn-sm" data-edit-slide="' + s.id + '">Edit</button>' +
+        '<button class="btn btn-danger btn-sm" data-del-slide="' + s.id + '">Delete</button></div></div>';
+    }).join("");
+    document.querySelectorAll("[data-edit-slide]").forEach(function (b) { b.addEventListener("click", function () { openSlideModal(b.getAttribute("data-edit-slide")); }); });
+    document.querySelectorAll("[data-del-slide]").forEach(function (b) {
+      b.addEventListener("click", function () { if (confirm("Delete this slide image?")) { SH.remove("slides", b.getAttribute("data-del-slide")); renderSlidesList(); refreshCounts(); toast("Slide image deleted"); } });
+    });
+  }
+  $("addSlide").addEventListener("click", function () { openSlideModal(null); });
+
+  function openSlideModal(id) {
+    var s = id ? SH.getItem("slides", id) : { img: "", alt: "" };
+    var html =
+      '<div class="fld"><label>Image</label><input type="file" id="slImgFile" accept="image/*">' +
+      '<img class="img-preview" id="slImgPreview" src="' + (s.img ? "../" + srcPath(s.img).replace(/^\.\.\//, "") : "") + '" style="' + (s.img ? "" : "display:none") + '"></div>' +
+      '<div class="fld"><label>Caption / Alt text (optional)</label><input id="slAlt" value="' + esc(s.alt || "") + '"></div>' +
+      '<p class="hint">Recommended: a wide banner image. Add two or more to make it slide every 2 seconds.</p>';
+    var pending = null;
+    openModal(id ? "Edit Slide Image" : "Add Slide Image", html, function () {
+      var obj = { id: id || undefined, alt: $("slAlt").value.trim(), img: s.img || "" };
+      if (pending) obj.img = pending;
+      if (!obj.img) { toast("Please choose an image"); return; }
+      SH.upsert("slides", obj); closeModal(); renderSlidesList(); refreshCounts(); toast("Slide image saved");
+    });
+    setTimeout(function () {
+      var f = $("slImgFile");
+      if (f) f.addEventListener("change", function () { readImage(f.files[0], function (d) { pending = d; $("slImgPreview").src = d; $("slImgPreview").style.display = "block"; }, { ratio: 4 / 3, maxW: 1000 }); });
+    }, 30);
+  }
+
   /* ---------- PRODUCTS ---------- */
   function renderProductsList() {    var list = SH.list("products");
     if (!list.length) { $("productsList").innerHTML = '<p class="empty">No products yet. Click "Add Product".</p>'; return; }
@@ -550,6 +590,7 @@
       if (page === "services") renderServicesList();
       if (page === "subservices") renderSubServicesList();
       if (page === "products") renderProductsList();
+      if (page === "slides") renderSlidesList();
       if (page === "team") renderTeamList();
       if (page === "admins") renderAdminsList();
       if (page === "orders") renderOrdersList();

@@ -21,6 +21,7 @@
                   features[], price} ]
      team      [ {id, name, role, img, bio, focus[]} ]
      ceo       { name, role, img, message[] }
+      slides    [ {id, img, alt} ]
      admins    [ {id, username, password, role} ]
      stats     { visitors, pageviews, orders }
    ========================================================= */
@@ -126,6 +127,12 @@
       },
       admins: [
         { id: "admin-1", username: "admin", password: "shahriyar123", role: "Owner" }
+      ],
+      /* hero slider images (admin-editable). Shown where the hero picture is. */
+      slides: [
+        { id: "slide-1", img: "assets/img/hero-team.jpg", alt: "Our development team" },
+        { id: "slide-2", img: "assets/img/about-office.jpg", alt: "Our office" },
+        { id: "slide-3", img: "assets/img/cta-bg.jpg", alt: "Shahriar LLC" }
       ],
       stats: { visitors: 0, pageviews: 0, orders: 0 }
     };

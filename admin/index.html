@@ -51,6 +51,7 @@
       <div class="sb-title">People</div>
       <a class="sb-link" data-page="team"><span class="i">&#128101;</span> Management Team <span class="badge" id="cTeam">0</span></a>
       <a class="sb-link" data-page="ceo"><span class="i">&#9873;</span> CEO Profile</a>
+      <a class="sb-link" data-page="slides"><span class="i">&#9783;</span> Slide Bar <span class="badge" id="cSlides">0</span></a>
     </div>
 
     <div class="sb-group">
@@ -198,6 +199,15 @@
           <div class="fld"><label>Message (one paragraph per block)</label><textarea name="message" id="ceoMessage" style="min-height:160px"></textarea><p class="hint">Put each paragraph on its own line.</p></div>
           <div class="actions-bar"><button class="btn btn-primary" type="submit">Save CEO Profile</button></div>
         </form>
+      </section>
+
+      <!-- ===== Slide Bar (hero slider images) ===== -->
+      <section class="page" id="page-slides">
+        <div class="page-h" style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap">
+          <div><h1>Slide Bar</h1><p>Images shown in the homepage hero picture. They slide automatically every 2 seconds. One image = no slide; add more to rotate.</p></div>
+          <button class="btn btn-primary" id="addSlide">+ Add Image</button>
+        </div>
+        <div id="slidesList"></div>
       </section>
 
       <!-- ===== Admins ===== -->

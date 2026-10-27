@@ -434,6 +434,35 @@
     document.querySelectorAll("#teamGrid, #homeTeam").forEach(function (g) { g.innerHTML = html; });
   }
 
+  /* ---- hero slider: slides the picture in the hero card ----
+     The container keeps the exact same box as the old single image.
+     With 0 or 1 slide it just shows that image (no timer). */
+  var heroTimer = null;
+  function renderHeroSlider(slides) {
+    var host = document.getElementById("heroSlider");
+    if (!host) return;
+    if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
+    var list = (slides || []).filter(function (sl) { return sl && sl.img; });
+    /* No slides configured yet: keep whatever static image is already in
+       the markup so the hero picture never disappears. */
+    if (!list.length) return;
+
+    host.innerHTML = list.map(function (sl, i) {
+      return '<img class="hero-slide' + (i === 0 ? " is-active" : "") + '" src="' + esc(imgSrc(sl.img)) + '" alt="' + esc(sl.alt || "") + '"' +
+        (i === 0 ? "" : ' loading="lazy"') + ' />';
+    }).join("");
+
+    if (list.length < 2) return;   /* single image: nothing to slide */
+
+    var imgs = host.querySelectorAll(".hero-slide");
+    var idx = 0;
+    heroTimer = setInterval(function () {
+      imgs[idx].classList.remove("is-active");
+      idx = (idx + 1) % imgs.length;
+      imgs[idx].classList.add("is-active");
+    }, 2000);
+  }
+
   /* Apply live content from the store to every visible element. */
   function applyLiveContent() {
     if (!window.SH) return;
@@ -542,6 +571,9 @@
 
     /* ---- management team grids (about.html, team.html) ---- */
     renderTeamGrids(d.team || []);
+
+    /* ---- hero slider (index.html hero picture) ---- */
+    renderHeroSlider(d.slides || []);
 
     /* ---- document title / brand text in browser tab ---- */
     if (s.company) {
