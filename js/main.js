@@ -358,6 +358,64 @@
     });
   }
 
+  /* Resolve an image path to a src usable from any page depth. */
+  function imgSrc(img) {
+    if (!img) return "";
+    return /^(assets\/|data:|http|\.\.\/|\/)/.test(img) ? img : ("assets/" + img);
+  }
+
+  /* Fill CEO name / role / photo / message wherever hooks exist. */
+  function bindCeo(c) {
+    if (!c) return;
+    var name = c.name || "";
+    var role = c.role || "";
+    var msg = c.message || [];
+
+    document.querySelectorAll("[data-ceo='photo'], .ceo-photo > img").forEach(function (el) {
+      if (el.tagName === "IMG" && c.img) { el.src = imgSrc(c.img); el.alt = name || el.alt; }
+    });
+    document.querySelectorAll("[data-ceo='name'], .ceo-name > strong").forEach(function (el) {
+      if (name) el.textContent = name.toUpperCase();
+    });
+    document.querySelectorAll("[data-ceo='role'], .ceo-name > span").forEach(function (el) {
+      if (role) el.textContent = role;
+    });
+    /* CEO message paragraphs (ceo.html + about.html#ceo) */
+    document.querySelectorAll("[data-ceo='message']").forEach(function (wrap) {
+      if (!msg.length) return;
+      wrap.innerHTML = msg.map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("");
+    });
+    document.querySelectorAll(".ceo-sign").forEach(function (el) {
+      if (name && role) el.innerHTML = "&mdash; " + esc(name) + ", " + esc(role);
+    });
+  }
+
+  /* Build a team card grid for both about.html and team.html. */
+  var TEAM_FALLBACK = [
+    { id: "md-mofakhkharul-islam", name: "Md. Mofakhkharul Islam", role: "CEO & Managing Director", img: "assets/img/team-1.jpg" },
+    { id: "md-mohiuddin-ahmed", name: "Md. Mohiuddin Ahmed", role: "Director (Finance)", img: "assets/img/team-2.jpg" },
+    { id: "md-tariqul-azam", name: "Md Tariqul Azam", role: "Managing Partner (Business Development)", img: "assets/img/team-3.jpg" },
+    { id: "john-henao", name: "John Henao", role: "Inter. Market Managing Partner", img: "assets/img/team-4.jpg" },
+    { id: "head-of-engineering", name: "Head of Engineering", role: "Software Architecture", img: "assets/img/team-5.jpg" },
+    { id: "manager-client-success", name: "Manager, Client Success", role: "Customer Support", img: "assets/img/team-6.jpg" }
+  ];
+  function teamData() {
+    if (window.SH && SH.list("team").length) return SH.list("team");
+    return TEAM_FALLBACK;
+  }
+  function slugOf(m) {
+    return m.id || String(m.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
+  function renderTeamGrids(team) {
+    var list = (team && team.length) ? team : teamData();
+    var html = list.map(function (m, i) {
+      return '<a class="member reveal in" href="profile.html?m=' + esc(slugOf(m)) + '" style="--d:' + ((i % 4) * 90) + 'ms;text-decoration:none">' +
+        '<div class="member-photo"><img src="' + esc(imgSrc(m.img)) + '" alt="' + esc(m.name || "") + '" loading="lazy"></div>' +
+        '<div class="mb"><h3>' + esc(m.name || "") + '</h3><span>' + esc(m.role || "") + '</span></div></a>';
+    }).join("");
+    document.querySelectorAll("#teamGrid, #homeTeam").forEach(function (g) { g.innerHTML = html; });
+  }
+
   /* Apply live content from the store to every visible element. */
   function applyLiveContent() {
     if (!window.SH) return;
@@ -449,6 +507,12 @@
     if (s.logo) {
       document.querySelectorAll("img[src*='logo.svg']").forEach(function (im) { im.src = s.logo; });
     }
+
+    /* ---- CEO profile (ceo.html + about.html #ceo) ---- */
+    bindCeo(d.ceo || {});
+
+    /* ---- management team grids (about.html, team.html) ---- */
+    renderTeamGrids(d.team || []);
 
     /* ---- document title / brand text in browser tab ---- */
     if (s.company) {

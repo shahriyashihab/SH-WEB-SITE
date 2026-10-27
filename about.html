@@ -96,17 +96,19 @@
       </div>
       <div class="ceo-block">
         <div class="ceo-photo reveal from-left">
-          <img src="assets/img/ceo.jpg" alt="CEO & Managing Director" />
+          <img data-ceo="photo" src="assets/img/ceo.jpg" alt="CEO & Managing Director" />
           <div class="ceo-name">
-            <strong>MD. MOFAKHKHARUL ISLAM</strong>
-            <span>CEO &amp; Managing Director</span>
+            <strong data-ceo="name">MD. MOFAKHKHARUL ISLAM</strong>
+            <span data-ceo="role">CEO &amp; Managing Director</span>
           </div>
         </div>
         <div class="ceo-msg reveal from-right">
-          <p>Welcome to Shahriar LLC</p>
-          <p>Since 2007 we have grown from a small team of passionate engineers into a diversified offshore IT services company trusted by organisations across Bangladesh and beyond. Our mission has never changed: to deliver software that creates real, measurable value for the people who use it.</p>
-          <p>In a fast-moving digital world, we believe the difference between good and great companies is accountability. That is why every project we take on is owned end-to-end by a senior team &mdash; the same people who build your product stay with you to support it.</p>
-          <p>Whether you need a website, an enterprise platform, or a fully custom solution, our commitment remains the same: quality engineering, transparent delivery and lifetime-friendly support.</p>
+          <div data-ceo="message">
+            <p>Welcome to Shahriar LLC</p>
+            <p>Since 2007 we have grown from a small team of passionate engineers into a diversified offshore IT services company trusted by organisations across Bangladesh and beyond. Our mission has never changed: to deliver software that creates real, measurable value for the people who use it.</p>
+            <p>In a fast-moving digital world, we believe the difference between good and great companies is accountability. That is why every project we take on is owned end-to-end by a senior team &mdash; the same people who build your product stay with you to support it.</p>
+            <p>Whether you need a website, an enterprise platform, or a fully custom solution, our commitment remains the same: quality engineering, transparent delivery and lifetime-friendly support.</p>
+          </div>
           <p class="ceo-sign">&mdash; MD. Mofakhkharul Islam, CEO &amp; Managing Director</p>
         </div>
       </div>
@@ -162,25 +164,6 @@
 <script src="js/stats.js"></script>
 <script src="js/store.js"></script>
 <script src="js/main.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded",function(){
-  var T=[
-    ["Md. Mofakhkharul Islam","CEO & Managing Director","assets/img/team-1.jpg"],
-    ["Md. Mohiuddin Ahmed","Director (Finance)","assets/img/team-2.jpg"],
-    ["Md Tariqul Azam","Managing Partner (Business Development)","assets/img/team-3.jpg"],
-    ["John Henao","Inter. Market Managing Partner","assets/img/team-4.jpg"],
-    ["Head of Engineering","Software Architecture","assets/img/team-5.jpg"],
-    ["Manager, Client Success","Customer Support","assets/img/team-6.jpg"]
-  ];
-  var g=document.getElementById("teamGrid");
-  if(g) g.innerHTML=T.map(function(m,i){
-    return '<article class="member reveal" style="--d:'+(i%4*90)+'ms">'
-      +'<div class="member-photo"><img src="'+m[2]+'" alt="'+m[0]+'" loading="lazy"></div>'
-      +'<div class="mb"><h3>'+m[0]+'</h3><span>'+m[1]+'</span></div></article>';
-  }).join("");
-  document.querySelectorAll(".reveal").forEach(function(el){el.classList.add("in")});
-});
-</script>
 <script src="js/seo.js"></script>
 </body>
 </html>

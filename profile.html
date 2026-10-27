@@ -126,20 +126,22 @@
       focus:["Client onboarding","Support","Project delivery","Customer satisfaction"]}
   ];
   var slug=new URLSearchParams(location.search).get("m");
-  var m=null;
-  if(window.SH && SH.list("team").length){
-    m=SH.getItem("team",slug);
+  function render(){
+    var m=null;
+    if(window.SH && SH.list("team").length){ m=SH.getItem("team",slug); }
+    if(!m){ for(var i=0;i<TEAM.length;i++){ if(TEAM[i].slug===slug){ m=TEAM[i]; break; } } }
+    if(!m) m=TEAM[0];
+    var img=(/^(assets\/|data:|http)/.test(m.img||"")?m.img:("assets/"+m.img));
+    document.title=m.n+" | Shahriar LLC";
+    $("mName").textContent=m.n; $("mCrumb").textContent=m.n;
+    $("mTitle").textContent=m.n; $("mRole").textContent=m.r;
+    $("mImg").src=img; $("mImg").alt=m.n;
+    $("mHeading").textContent="About "+m.n;
+    $("mBio").textContent=m.bio;
+    $("mFocus").innerHTML=(m.focus||[]).map(function(f){return "<li>"+f+"</li>"}).join("");
   }
-  if(!m){ for(var i=0;i<TEAM.length;i++){ if(TEAM[i].slug===slug){ m=TEAM[i]; break; } } }
-  if(!m) m=TEAM[0];
-  var img=(/^(assets\/|data:|http)/.test(m.img||"")?m.img:("assets/"+m.img));
-  document.title=m.n+" | Shahriar LLC";
-  $("mName").textContent=m.n; $("mCrumb").textContent=m.n;
-  $("mTitle").textContent=m.n; $("mRole").textContent=m.r;
-  $("mImg").src=img; $("mImg").alt=m.n;
-  $("mHeading").textContent="About "+m.n;
-  $("mBio").textContent=m.bio;
-  $("mFocus").innerHTML=(m.focus||[]).map(function(f){return "<li>"+f+"</li>"}).join("");
+  render();
+  window.addEventListener("sh:change", render);
 })();
 </script>
 <script src="js/seo.js"></script>

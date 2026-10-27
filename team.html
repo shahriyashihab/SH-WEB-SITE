@@ -98,30 +98,6 @@
 <script src="js/catalog.js"></script>
 <script src="js/store.js"></script>
 <script src="js/main.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded",function(){
-  var T=[
-    {n:"Md. Mofakhkharul Islam", r:"CEO & Managing Director", img:"assets/img/team-1.jpg"},
-    {n:"Md. Mohiuddin Ahmed", r:"Director (Finance)", img:"assets/img/team-2.jpg"},
-    {n:"Md Tariqul Azam", r:"Managing Partner (Business Development)", img:"assets/img/team-3.jpg"},
-    {n:"John Henao", r:"Inter. Market Managing Partner", img:"assets/img/team-4.jpg"},
-    {n:"Head of Engineering", r:"Software Architecture", img:"assets/img/team-5.jpg"},
-    {n:"Manager, Client Success", r:"Customer Support", img:"assets/img/team-6.jpg"}
-  ];
-  if(window.SH && SH.list("team").length){
-    T=SH.list("team").map(function(m){return {n:m.name,r:m.role,img:m.img,id:m.id};});
-  }
-  var g=document.getElementById("teamGrid");
-  if(g) g.innerHTML=T.map(function(m,i){
-    var slug=m.id||m.n.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
-    var src=(/^(assets\/|data:|http)/.test(m.img||"")?m.img:("assets/"+m.img));
-    return '<a class="member reveal" href="profile.html?m='+slug+'" style="--d:'+(i%4*90)+'ms;text-decoration:none">'
-      +'<div class="member-photo"><img src="'+src+'" alt="'+m.n+'" loading="lazy"></div>'
-      +'<div class="mb"><h3>'+m.n+'</h3><span>'+m.r+'</span></div></a>';
-  }).join("");
-  document.querySelectorAll(".reveal").forEach(function(el){el.classList.add("in")});
-});
-</script>
 <script src="js/seo.js"></script>
 </body>
 </html>

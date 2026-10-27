@@ -120,9 +120,17 @@
   }
 
   /* ---------- image helper ---------- */
-  function readImage(file, cb) {
+  /* Opens the crop tool so the admin can frame the photo, then returns a
+     small data URL via cb. Falls back to a plain read if the cropper is
+     unavailable. opts.ratio controls the crop aspect ratio. */
+  function readImage(file, cb, opts) {
     if (!file) return;
-    if (file.size > 1500000) { toast("Image too large (max ~1.5MB)"); }
+    if (!/^image\//.test(file.type)) { toast("Please choose an image file"); return; }
+    if (window.SHCrop) {
+      window.SHCrop.open(file, opts || {}, cb);
+      return;
+    }
+    if (file.size > 3000000) { toast("Image too large (max ~3MB)"); }
     var r = new FileReader();
     r.onload = function () { cb(r.result); };
     r.readAsDataURL(file);
@@ -138,7 +146,7 @@
     if (s.logo) { $("logoPreview").src = s.logo; $("logoPreview").style.display = "block"; }
   }
   var pendingLogo = null;
-  $("logoFile").addEventListener("change", function () { readImage(this.files[0], function (d) { pendingLogo = d; $("logoPreview").src = d; $("logoPreview").style.display = "block"; }); });
+  $("logoFile").addEventListener("change", function () { readImage(this.files[0], function (d) { pendingLogo = d; $("logoPreview").src = d; $("logoPreview").style.display = "block"; }, { ratio: 0, maxW: 600 }); });
   $("companyForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var s = SH.get().site, f = e.target;
@@ -167,7 +175,7 @@
     $("ceoMessage").value = (c.message || []).join("\n");
     $("ceoPreview").src = c.img || ""; $("ceoPreview").style.display = c.img ? "block" : "none";
   }
-  $("ceoFile").addEventListener("change", function () { readImage(this.files[0], function (d) { pendingCeoImg = d; $("ceoPreview").src = d; $("ceoPreview").style.display = "block"; }); });
+  $("ceoFile").addEventListener("change", function () { readImage(this.files[0], function (d) { pendingCeoImg = d; $("ceoPreview").src = d; $("ceoPreview").style.display = "block"; }, { ratio: 3 / 4, maxW: 800 }); });
   $("ceoForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var c = SH.get().ceo;
@@ -238,7 +246,7 @@
     });
     setTimeout(function () {
       var f = $("mImgFile");
-      if (f) f.addEventListener("change", function () { readImage(f.files[0], function (d) { pending = d; $("mImgPreview").src = d; $("mImgPreview").style.display = "block"; }); });
+      if (f) f.addEventListener("change", function () { readImage(f.files[0], function (d) { pending = d; $("mImgPreview").src = d; $("mImgPreview").style.display = "block"; }, { ratio: 4 / 3, maxW: 900 }); });
     }, 30);
   }
 
@@ -284,7 +292,7 @@
       if (!obj.name) { toast("Product name is required"); return; }
       SH.upsert("products", obj); closeModal(); renderProductsList(); refreshCounts(); toast("Product saved");
     });
-    setTimeout(function () { var f = $("pImgFile"); if (f) f.addEventListener("change", function () { readImage(f.files[0], function (d) { pending = d; $("pImgPreview").src = d; $("pImgPreview").style.display = "block"; }); }); }, 30);
+    setTimeout(function () { var f = $("pImgFile"); if (f) f.addEventListener("change", function () { readImage(f.files[0], function (d) { pending = d; $("pImgPreview").src = d; $("pImgPreview").style.display = "block"; }, { ratio: 4 / 3, maxW: 900 }); }); }, 30);
   }
 
   /* ---------- TEAM ---------- */
@@ -326,7 +334,7 @@
       if (!obj.name) { toast("Name is required"); return; }
       SH.upsert("team", obj); closeModal(); renderTeamList(); refreshCounts(); toast("Team member saved");
     });
-    setTimeout(function () { var f = $("tmImgFile"); if (f) f.addEventListener("change", function () { readImage(f.files[0], function (d) { pending = d; $("tmImgPreview").src = d; $("tmImgPreview").style.display = "block"; }); }); }, 30);
+    setTimeout(function () { var f = $("tmImgFile"); if (f) f.addEventListener("change", function () { readImage(f.files[0], function (d) { pending = d; $("tmImgPreview").src = d; $("tmImgPreview").style.display = "block"; }, { ratio: 3 / 4, maxW: 800 }); }); }, 30);
   }
 
   /* ---------- ADMINS ---------- */
