@@ -150,28 +150,11 @@
   }
 
   function resolve(){
-    /* A sub-service fully overrides the parent item when present. */
+    /* A sub-service fully overrides the parent item when present.
+       Sub-services come only from the store (admin-editable): if the
+       admin deleted one, it must not reappear from the catalog. */
     if(subId){
-      var sub=null;
-      if(window.SH) sub=SH.getItem("subservices",subId);
-      /* fallback: subId may be "parent:slug" from the built-in catalog */
-      if(!sub && subId.indexOf(":")>-1){
-        var parts=subId.split(":");
-        var p=parts[0], sl=parts.slice(1).join(":");
-        var pc=cat[p];
-        if(pc && pc.items){
-          for(var i=0;i<pc.items.length;i++){
-            if(pc.items[i].slug===sl){
-              var it=pc.items[i];
-              return {type:"Service",sub:true,parent:p,parentTitle:pc.title,
-                title:it.title,icon:pc.icon||"code",color:pc.color||"blue",img:it.img||pc.img,
-                short:it.tagline||"",overview:it.overview||"",
-                features:it.features||[],includes:it.includes||[],
-                price:it.price||"",delivery:it.delivery||""};
-            }
-          }
-        }
-      }
+      var sub=window.SH?SH.getItem("subservices",subId):null;
       if(sub){
         var par=(window.CATALOG||{})[sub.parent]||{};
         return {type:"Service",sub:true,parent:sub.parent,parentTitle:par.title||sub.parent,
@@ -223,20 +206,13 @@
     if(item.delivery) priceText+="  \u00b7  "+item.delivery;
     $("dPrice").textContent=priceText;
 
-    /* related: sibling sub-services of the same parent, else same-type catalog items */
+    /* related: sibling sub-services of the same parent (store only),
+       else same-type catalog items for products/services. */
     var rel=[], heading="Related Solutions";
     if(item.sub && item.parent){
-      /* admin sub-services first */
       if(window.SH){
         var sibs=SH.list("subservices").filter(function(x){return x.parent===item.parent && x.id!==subId;});
         rel=sibs.slice(0,3).map(function(x){return {title:x.title,short:x.tagline||"",img:x.img,color:x.color,href:"detail?item="+encodeURIComponent(x.parent)+"&sub="+encodeURIComponent(x.id)};});
-      }
-      /* fallback: sibling items from the built-in catalog */
-      if(!rel.length){
-        var pc=cat[item.parent];
-        if(pc && pc.items){
-          rel=pc.items.filter(function(x){return (item.parent+":"+x.slug)!==subId;}).slice(0,3).map(function(x){return {title:x.title,short:x.tagline||"",img:x.img||pc.img,color:pc.color,href:"detail?item="+encodeURIComponent(item.parent)+"&sub="+encodeURIComponent(item.parent+":"+x.slug)};});
-        }
       }
       if(rel.length) heading="Other "+item.parentTitle+" Options";
     } else {

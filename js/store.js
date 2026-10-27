@@ -169,13 +169,21 @@
   /* ---------- merge a remote/cloud snapshot ---------- */
   function mergeRemote(remote) {
     if (!remote || typeof remote !== "object" || remote.__message) return false;
-    /* shallow merge at top level, deep-merge the fixed objects */
+    /* Merge each collection safely:
+       - objects (site/hero/stats/ceo): merge field-by-field
+       - arrays (team/products/services/subservices): only take the cloud
+         copy when it is a real array. A null/undefined cloud value must
+         NEVER wipe the local seed, otherwise admin data can be lost. */
     Object.keys(remote).forEach(function (k) {
+      var val = remote[k];
       if (k === "site" || k === "hero" || k === "stats" || k === "ceo") {
-        DATA[k] = Object.assign({}, DATA[k] || {}, remote[k] || {});
-      } else {
-        DATA[k] = remote[k];
+        if (val && typeof val === "object") DATA[k] = Object.assign({}, DATA[k] || {}, val);
+      } else if (Array.isArray(val)) {
+        DATA[k] = val;
+      } else if (val && typeof val === "object") {
+        DATA[k] = val;
       }
+      /* val === null/undefined -> keep the local value */
     });
     CLOUD = true;
     try { localStorage.setItem(KEY, JSON.stringify(DATA)); } catch (e) {}
