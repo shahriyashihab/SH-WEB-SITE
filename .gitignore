@@ -3,6 +3,9 @@
 .vscode/
 .idea/
 
+# Local test harness (manual testing only, never deployed)
+test/
+
 # OS junk
 Thumbs.db
 desktop.ini

@@ -46,7 +46,7 @@
   }
 
   /* ---------- navigation ---------- */
-  var PAGES = { dashboard: "Dashboard", company: "Company Settings", hero: "Home / Hero", services: "Services", products: "Products", team: "Management Team", ceo: "CEO Profile", admins: "Admin Users", orders: "Orders / Leads" };
+  var PAGES = { dashboard: "Dashboard", company: "Company Settings", hero: "Home / Hero", services: "Services", subservices: "Sub-Services", products: "Products", team: "Management Team", ceo: "CEO Profile", admins: "Admin Users", orders: "Orders / Leads" };
   function goto(page) {
     document.querySelectorAll(".sb-link").forEach(function (l) { l.classList.toggle("active", l.getAttribute("data-page") === page); });
     document.querySelectorAll(".page").forEach(function (p) { p.classList.toggle("active", p.id === "page-" + page); });
@@ -54,6 +54,7 @@
     $("sidebar").classList.remove("open");
     if (page === "dashboard") renderDashboard();
     if (page === "services") renderServicesList();
+    if (page === "subservices") renderSubServicesList();
     if (page === "products") renderProductsList();
     if (page === "team") renderTeamList();
     if (page === "admins") renderAdminsList();
@@ -72,6 +73,7 @@
 
   function refreshCounts() {
     $("cServices").textContent = SH.list("services").length;
+    if ($("cSub")) $("cSub").textContent = SH.list("subservices").length;
     $("cProducts").textContent = SH.list("products").length;
     $("cTeam").textContent = SH.list("team").length;
     $("cAdmins").textContent = SH.list("admins").length;
@@ -250,9 +252,98 @@
     }, 30);
   }
 
+  /* ---------- SUB-SERVICES ---------- */
+  /* Main services the admin can attach a sub-service to. Falls back to the
+     built-in service list so the dropdown is never empty. */
+  var BUILTIN_SERVICES = [
+    { id: "website-design-development", title: "Website Design & Development" },
+    { id: "custom-software-development", title: "Custom Software Development" },
+    { id: "mobile-apps-development", title: "Mobile Apps Development" },
+    { id: "erp-crm-solutions", title: "ERP & CRM Solutions" },
+    { id: "digital-marketing", title: "Digital Marketing" },
+    { id: "it-support-consultancy", title: "IT Support & Consultancy" },
+    { id: "ecommerce-solution", title: "E-commerce Solution" },
+    { id: "hr-payroll-management", title: "HR & Payroll Management" },
+    { id: "pos-retail-software", title: "POS & Retail Software" },
+    { id: "school-management-system", title: "School Management System" },
+    { id: "business-process-outsourcing", title: "Business Process Outsourcing" },
+    { id: "cyber-security", title: "Cyber Security" }
+  ];
+  function parentServices() {
+    var live = SH.list("services");
+    return (live && live.length) ? live.map(function (s) { return { id: s.id, title: s.title }; }) : BUILTIN_SERVICES;
+  }
+  function parentTitle(id) {
+    var list = parentServices();
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i].title;
+    return id || "-";
+  }
+
+  function renderSubServicesList() {
+    var list = SH.list("subservices");
+    if (!list.length) { $("subServicesList").innerHTML = '<p class="empty">No sub-services yet. Click "Add Sub-Service".</p>'; return; }
+    $("subServicesList").innerHTML = list.map(function (s) {
+      var thumb = s.img ? '<img src="../' + esc(srcPath(s.img)) + '" alt="">' : '<div class="thumb-fallback">' + esc((s.title || "S").slice(0, 4)) + '</div>';
+      return '<div class="row-item">' + thumb +
+        '<div class="info"><b>' + esc(s.title) + '</b><span>' + esc(parentTitle(s.parent)) + ' &bull; ' + esc(s.tagline || s.short || "") + '</span></div>' +
+        '<div class="row-actions"><button class="btn btn-outline btn-sm" data-edit-sub="' + s.id + '">Edit</button>' +
+        '<button class="btn btn-danger btn-sm" data-del-sub="' + s.id + '">Delete</button></div></div>';
+    }).join("");
+    document.querySelectorAll("[data-edit-sub]").forEach(function (b) { b.addEventListener("click", function () { openSubServiceModal(b.getAttribute("data-edit-sub")); }); });
+    document.querySelectorAll("[data-del-sub]").forEach(function (b) {
+      b.addEventListener("click", function () { if (confirm("Delete this sub-service?")) { SH.remove("subservices", b.getAttribute("data-del-sub")); renderSubServicesList(); refreshCounts(); toast("Sub-service deleted"); } });
+    });
+  }
+  $("addSubService").addEventListener("click", function () { openSubServiceModal(null); });
+
+  function srcPath(img) {
+    if (!img) return "";
+    if (/^(data:|http|\.\.\/|\/)/.test(img)) return img;
+    if (/^assets\//.test(img)) return img;
+    return "assets/" + img;
+  }
+
+  function openSubServiceModal(id) {
+    var s = id ? SH.getItem("subservices", id) : { parent: (parentServices()[0] || {}).id || "", title: "", icon: "code", color: "blue", img: "", tagline: "", overview: "", features: [], includes: [], price: "Contact for pricing", delivery: "" };
+    var parents = parentServices();
+    var html =
+      '<div class="fld"><label>Belongs to (Main Service)</label><select id="sParent">' +
+        parents.map(function (p) { return '<option value="' + esc(p.id) + '"' + (s.parent === p.id ? " selected" : "") + '>' + esc(p.title) + '</option>'; }).join("") +
+      '</select></div>' +
+      '<div class="form-grid two"><div class="fld"><label>Title</label><input id="sTitle" value="' + esc(s.title) + '"></div>' +
+      '<div class="fld"><label>Short Tagline</label><input id="sTagline" value="' + esc(s.tagline) + '"></div></div>' +
+      '<div class="fld"><label>Overview</label><textarea id="sOverview">' + esc(s.overview) + '</textarea></div>' +
+      '<div class="fld"><label>Features (one per line)</label><textarea id="sFeatures">' + esc((s.features || []).join("\n")) + '</textarea></div>' +
+      '<div class="fld"><label>What\'s Included (one per line)</label><textarea id="sIncludes">' + esc((s.includes || []).join("\n")) + '</textarea></div>' +
+      '<div class="form-grid two"><div class="fld"><label>Price Text</label><input id="sPrice" value="' + esc(s.price) + '"></div>' +
+      '<div class="fld"><label>Delivery / Timeline</label><input id="sDelivery" value="' + esc(s.delivery) + '"></div></div>' +
+      '<div class="fld"><label>Image</label><input type="file" id="sImgFile" accept="image/*">' +
+      '<img class="img-preview" id="sImgPreview" src="' + (s.img ? "../" + srcPath(s.img).replace(/^\.\.\//, "") : "") + '" style="' + (s.img ? "" : "display:none") + '"></div>';
+    var pending = null;
+    openModal(id ? "Edit Sub-Service" : "Add Sub-Service", html, function () {
+      var obj = {
+        id: id || undefined,
+        parent: $("sParent").value,
+        title: $("sTitle").value.trim(),
+        tagline: $("sTagline").value.trim(),
+        overview: $("sOverview").value.trim(),
+        features: $("sFeatures").value.split("\n").map(function (x) { return x.trim(); }).filter(Boolean),
+        includes: $("sIncludes").value.split("\n").map(function (x) { return x.trim(); }).filter(Boolean),
+        price: $("sPrice").value.trim(), delivery: $("sDelivery").value.trim(),
+        icon: s.icon || "code", color: s.color || "blue", img: s.img || ""
+      };
+      if (pending) obj.img = pending;
+      if (!obj.title) { toast("Title is required"); return; }
+      SH.upsert("subservices", obj); closeModal(); renderSubServicesList(); refreshCounts(); toast("Sub-service saved");
+    });
+    setTimeout(function () {
+      var f = $("sImgFile");
+      if (f) f.addEventListener("change", function () { readImage(f.files[0], function (d) { pending = d; $("sImgPreview").src = d; $("sImgPreview").style.display = "block"; }, { ratio: 4 / 3, maxW: 900 }); });
+    }, 30);
+  }
+
   /* ---------- PRODUCTS ---------- */
-  function renderProductsList() {
-    var list = SH.list("products");
+  function renderProductsList() {    var list = SH.list("products");
     if (!list.length) { $("productsList").innerHTML = '<p class="empty">No products yet. Click "Add Product".</p>'; return; }
     $("productsList").innerHTML = list.map(function (p) {
       var thumb = p.img ? '<img src="../' + esc(p.img) + '" alt="">' : '<div class="thumb-fallback">' + esc(p.logo || "P") + '</div>';
@@ -457,6 +548,7 @@
       var active = document.querySelector(".sb-link.active");
       var page = active && active.getAttribute("data-page");
       if (page === "services") renderServicesList();
+      if (page === "subservices") renderSubServicesList();
       if (page === "products") renderProductsList();
       if (page === "team") renderTeamList();
       if (page === "admins") renderAdminsList();

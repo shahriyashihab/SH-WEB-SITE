@@ -13,9 +13,11 @@
    Schema:
      site      { company, tagline, subTagline, phone, email, address,
                  facebook, instagram, telegram, logo (dataURL|url) }
-     services  [ {id, title, icon, color, img, short, overview,
-                  features[], includes[]} ]
-     products  [ {id, name, tag, logo, img, short, overview,
+      services  [ {id, title, icon, color, img, short, overview,
+                   features[], includes[]} ]
+      subservices [ {id, parent, title, icon, color, img, tagline,
+                   overview, features[], includes[], price, delivery} ]
+      products  [ {id, name, tag, logo, img, short, overview,
                   features[], price} ]
      team      [ {id, name, role, img, bio, focus[]} ]
      ceo       { name, role, img, message[] }
@@ -62,6 +64,7 @@
         { id: "digital-marketing", title: "Digital Marketing", icon: "cloud", color: "green", img: "assets/img/svc-marketing.jpg", short: "Grow reach with SEO and campaigns.", overview: "Data-driven digital marketing.", features: ["SEO", "Social media", "Content strategy", "Paid ads", "Analytics", "Conversion optimization"], includes: ["Audit", "Keyword research", "Campaign setup", "Content", "Monitoring", "Reports"] },
         { id: "it-support-consultancy", title: "IT Support & Consultancy", icon: "shield", color: "blue", img: "assets/img/svc-support.jpg", short: "Reliable IT support and expert guidance.", overview: "Keep systems running and plan your roadmap.", features: ["24/7 support", "Infrastructure consulting", "Security audits", "Cloud migration", "Backup", "IT strategy"], includes: ["Assessment", "Recommendations", "Implementation", "Monitoring", "Maintenance", "Reports"] }
       ],
+      subservices: [],
       products: [
         { id: "sheba-erp", name: "Sheba ERP", tag: "Best ERP Software in Bangladesh", logo: "ERP", img: "assets/img/prod-erp.jpg", short: "All-in-one enterprise resource planning.", overview: "Sheba ERP unifies accounts, inventory, sales and HR.", features: ["Accounts & finance", "Inventory", "Sales & purchase", "HR & payroll", "Dashboards", "Multi-branch"], price: "Contact for pricing" },
         { id: "hr-sheba", name: "HR Sheba", tag: "Best HR & Payroll Software", logo: "HR", img: "assets/img/prod-hr.jpg", short: "Complete HR and payroll automation.", overview: "HR Sheba handles employees, attendance and payroll.", features: ["Employee database", "Attendance", "Payroll", "Tax sheets", "Self-service", "Reports"], price: "Contact for pricing" },

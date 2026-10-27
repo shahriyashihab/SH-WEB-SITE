@@ -126,7 +126,7 @@
   function svcCard(s, i) {
     var delay = (i % 3) * 110;
     var slug = s[4] || "";
-    var link = slug ? "detail.html?item=" + slug : "services.html";
+    var link = slug ? "service.html?item=" + encodeURIComponent(slug) : "services.html";
     var img = s[2] || "img/svc-web.jpg";
     var src = /^(assets\/|data:|http)/.test(img) ? img : ("assets/" + img);
     return '<article class="service-card reveal" style="--d:' + delay + 'ms">' +

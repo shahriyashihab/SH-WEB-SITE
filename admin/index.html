@@ -43,6 +43,7 @@
       <a class="sb-link" data-page="company"><span class="i">&#9881;</span> Company Settings</a>
       <a class="sb-link" data-page="hero"><span class="i">&#9733;</span> Home / Hero</a>
       <a class="sb-link" data-page="services"><span class="i">&#9776;</span> Services <span class="badge" id="cServices">0</span></a>
+      <a class="sb-link" data-page="subservices"><span class="i">&#9776;</span> Sub-Services <span class="badge" id="cSub">0</span></a>
       <a class="sb-link" data-page="products"><span class="i">&#9635;</span> Products <span class="badge" id="cProducts">0</span></a>
     </div>
 
@@ -155,6 +156,15 @@
           <button class="btn btn-primary" id="addService">+ Add Service</button>
         </div>
         <div id="servicesList"></div>
+      </section>
+
+      <!-- ===== Sub-Services ===== -->
+      <section class="page" id="page-subservices">
+        <div class="page-h" style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap">
+          <div><h1>Sub-Services</h1><p>Detailed offerings that appear under each main service. Choose which service each one belongs to.</p></div>
+          <button class="btn btn-primary" id="addSubService">+ Add Sub-Service</button>
+        </div>
+        <div id="subServicesList"></div>
       </section>
 
       <!-- ===== Products ===== -->

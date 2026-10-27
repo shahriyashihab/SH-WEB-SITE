@@ -130,51 +130,126 @@
   var esc=function(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];})};
   var params=new URLSearchParams(location.search);
   var slug=params.get("item");
+  var subId=params.get("sub");
   var cat=window.CATALOG||{};
-  var item=cat[slug];
-  /* prefer live store data (admin) */
-  if(window.SH){
-    var s=SH.getItem("services",slug), p=SH.getItem("products",slug);
-    if(s) item={type:"Service",title:s.title,icon:s.icon,color:s.color,img:s.img,short:s.short,overview:s.overview,features:s.features,includes:s.includes};
-    else if(p) item={type:"Product",title:p.name,icon:"erp",color:"blue",img:p.img,short:p.short,overview:p.overview,features:p.features,price:p.price};
-  }
-  if(!item){
-    $("dTitle").textContent="Not found";
-    document.querySelector(".detail-layout").innerHTML='<p style="grid-column:1/-1;color:var(--muted)">Sorry, this item could not be found. <a style="color:var(--brand)" href="services.html">Browse all services</a>.</p>';
-    var rel0=document.querySelector(".detail-related"); if(rel0) rel0.style.display="none";
-    return;
-  }
-  document.title=item.title+" | Shahriar LLC";
-  $("dTitle").textContent=item.title;
-  $("dCrumb").textContent=item.title;
-  $("dHeading").textContent=item.title;
-  $("dImg").src=(item.img?(/^(assets\/|data:|http)/.test(item.img)?item.img:("assets/"+item.img)):"assets/img/svc-web.jpg"); $("dImg").alt=item.title;
-  $("dType").textContent=item.type;
-  $("dOverview").textContent=item.short+" "+item.overview.replace(/&mdash;/g,"\u2014").replace(/&amp;/g,"&");
-  $("dFeatures").innerHTML=(item.features||[]).map(function(f){return "<li>"+f+"</li>"}).join("");
-  var inc=item.includes||[];
-  $("dIncludesTitle").style.display=inc.length?"":"none";
-  $("dIncludes").style.display=inc.length?"":"none";
-  $("dIncludes").innerHTML=inc.map(function(f){return "<li>"+f+"</li>"}).join("");
-  var tlink=$("dTypeLink");
-  tlink.textContent=item.type==="Product"?"Products":"Services";
-  tlink.href=item.type==="Product"?"products.html":"services.html";
-  $("dPrice").textContent=item.price||"Free consultation";
 
-  // related: same type, exclude self, up to 3
-  var rel=[],keys=Object.keys(cat);
-  keys.forEach(function(k){ if(k!==slug && cat[k].type===item.type) rel.push(k); });
-  rel=rel.slice(0,3);
-  if(!rel.length){ document.querySelector(".detail-related").style.display="none"; }
-  $("dRelated").innerHTML=rel.map(function(k,i){
-    var r=cat[k];
-    return '<article class="service-card reveal in" style="--d:'+(i*90)+'ms">'+
-      '<div class="sc-img"><img src="'+r.img+'" alt="'+esc(r.title)+'" loading="lazy"></div>'+
-      '<div class="sc-body"><span class="sc-ic icon-'+(r.color||"blue")+'">'+
-      '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span>'+
-      '<h3>'+esc(r.title)+'</h3><p>'+esc(r.short)+'</p>'+
-      '<a class="btn-service" href="detail.html?item='+k+'">View Details</a></div></article>';
-  }).join("");
+  function imgSrc(img,fb){
+    if(!img) return fb||"assets/img/svc-web.jpg";
+    return /^(assets\/|data:|http|\.\.\/|\/)/.test(img)?img:("assets/"+img);
+  }
+
+  function resolve(){
+    /* A sub-service fully overrides the parent item when present. */
+    if(subId){
+      var sub=null;
+      if(window.SH) sub=SH.getItem("subservices",subId);
+      /* fallback: subId may be "parent:slug" from the built-in catalog */
+      if(!sub && subId.indexOf(":")>-1){
+        var parts=subId.split(":");
+        var p=parts[0], sl=parts.slice(1).join(":");
+        var pc=cat[p];
+        if(pc && pc.items){
+          for(var i=0;i<pc.items.length;i++){
+            if(pc.items[i].slug===sl){
+              var it=pc.items[i];
+              return {type:"Service",sub:true,parent:p,parentTitle:pc.title,
+                title:it.title,icon:pc.icon||"code",color:pc.color||"blue",img:it.img||pc.img,
+                short:it.tagline||"",overview:it.overview||"",
+                features:it.features||[],includes:it.includes||[],
+                price:it.price||"",delivery:it.delivery||""};
+            }
+          }
+        }
+      }
+      if(sub){
+        var par=(window.CATALOG||{})[sub.parent]||{};
+        return {type:"Service",sub:true,parent:sub.parent,parentTitle:par.title||sub.parent,
+          title:sub.title,icon:sub.icon||"code",color:sub.color||"blue",img:sub.img,
+          short:sub.tagline||"",overview:sub.overview||"",
+          features:sub.features||[],includes:sub.includes||[],
+          price:sub.price||"",delivery:sub.delivery||""};
+      }
+    }
+    var item=cat[slug];
+    if(window.SH){
+      var s=SH.getItem("services",slug), p=SH.getItem("products",slug);
+      if(s) item={type:"Service",title:s.title,icon:s.icon,color:s.color,img:s.img,short:s.short,overview:s.overview,features:s.features,includes:s.includes};
+      else if(p) item={type:"Product",title:p.name,icon:"erp",color:"blue",img:p.img,short:p.short,overview:p.overview,features:p.features,price:p.price};
+    }
+    return item;
+  }
+
+  function clean(t){ return String(t||"").replace(/&mdash;/g,"\u2014").replace(/&amp;/g,"&").replace(/&nbsp;/g," ").replace(/&rsquo;/g,"\u2019"); }
+
+  function render(){
+    var item=resolve();
+    if(!item){
+      $("dTitle").textContent="Not found";
+      document.querySelector(".detail-layout").innerHTML='<p style="grid-column:1/-1;color:var(--muted)">Sorry, this item could not be found. <a style="color:var(--brand)" href="services.html">Browse all services</a>.</p>';
+      var rel0=document.querySelector(".detail-related"); if(rel0) rel0.style.display="none";
+      return;
+    }
+    document.title=item.title+" | Shahriar LLC";
+    $("dTitle").textContent=item.title;
+    $("dCrumb").textContent=item.title;
+    $("dHeading").textContent=item.title;
+    $("dImg").src=imgSrc(item.img); $("dImg").alt=item.title;
+    $("dType").textContent=item.type;
+    $("dOverview").textContent=clean((item.short?item.short+" ":"")+ (item.overview||""));
+    $("dFeatures").innerHTML=(item.features||[]).map(function(f){return "<li>"+esc(clean(f))+"</li>"}).join("");
+    var inc=item.includes||[];
+    $("dIncludesTitle").style.display=inc.length?"":"none";
+    $("dIncludes").style.display=inc.length?"":"none";
+    $("dIncludes").innerHTML=inc.map(function(f){return "<li>"+esc(clean(f))+"</li>"}).join("");
+
+    var tlink=$("dTypeLink");
+    tlink.textContent=item.sub?"Services":(item.type==="Product"?"Products":"Services");
+    tlink.href=item.sub?"service.html?item="+encodeURIComponent(item.parent):(item.type==="Product"?"products.html":"services.html");
+
+    var side=$("dSideTitle");
+    if(side) side.textContent=item.sub?item.title:"Interested?";
+    var priceText=item.price||"Free consultation";
+    if(item.delivery) priceText+="  \u00b7  "+item.delivery;
+    $("dPrice").textContent=priceText;
+
+    /* related: sibling sub-services of the same parent, else same-type catalog items */
+    var rel=[], heading="Related Solutions";
+    if(item.sub && item.parent){
+      /* admin sub-services first */
+      if(window.SH){
+        var sibs=SH.list("subservices").filter(function(x){return x.parent===item.parent && x.id!==subId;});
+        rel=sibs.slice(0,3).map(function(x){return {title:x.title,short:x.tagline||"",img:x.img,color:x.color,href:"detail.html?item="+encodeURIComponent(x.parent)+"&sub="+encodeURIComponent(x.id)};});
+      }
+      /* fallback: sibling items from the built-in catalog */
+      if(!rel.length){
+        var pc=cat[item.parent];
+        if(pc && pc.items){
+          rel=pc.items.filter(function(x){return (item.parent+":"+x.slug)!==subId;}).slice(0,3).map(function(x){return {title:x.title,short:x.tagline||"",img:x.img||pc.img,color:pc.color,href:"detail.html?item="+encodeURIComponent(item.parent)+"&sub="+encodeURIComponent(item.parent+":"+x.slug)};});
+        }
+      }
+      if(rel.length) heading="Other "+item.parentTitle+" Options";
+    } else {
+      var keys=Object.keys(cat);
+      rel=keys.filter(function(k){return k!==slug && cat[k].type===item.type;}).slice(0,3).map(function(k){return {title:cat[k].title,short:cat[k].short,img:cat[k].img,color:cat[k].color,href:"detail.html?item="+k};});
+    }
+    var relEl=document.querySelector(".detail-related");
+    if(!rel.length){ if(relEl) relEl.style.display="none"; }
+    else {
+      if(relEl) relEl.style.display="";
+      var rt=$("dRelatedTitle"); if(rt) rt.textContent=heading;
+      $("dRelated").innerHTML=rel.map(function(r,i){
+        return '<article class="service-card reveal in" style="--d:'+(i*90)+'ms">'+
+          '<div class="sc-img"><img src="'+esc(imgSrc(r.img)) +'" alt="'+esc(r.title)+'" loading="lazy"></div>'+
+          '<div class="sc-body"><span class="sc-ic icon-'+(r.color||"blue")+'">'+
+          '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span>'+
+          '<h3>'+esc(r.title)+'</h3><p>'+esc(clean(r.short))+'</p>'+
+          '<a class="btn-service" href="'+r.href+'">View Details</a></div></article>';
+      }).join("");
+    }
+  }
+
+  render();
+  window.addEventListener("sh:change", render);
 })();
 </script>
 <script src="js/seo.js"></script>
