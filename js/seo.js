@@ -40,12 +40,15 @@
   function qs(name) { return new URLSearchParams(location.search).get(name); }
 
   /* ---- current page identity ----
-     With clean URLs the path has no ".html" (e.g. /services). Normalise
-     the file name to a bare slug so the keyword/schema switches below
-     keep working for both /services and /services.html. */
+     With clean URLs the path has no ".html" (e.g. /services or /seo/foo).
+     Keep the FULL path (folder included) for the canonical so /seo pages
+     never lose their "/seo/" segment. "file" is the bare last segment used
+     only for the keyword/schema switches below. */
+  var cleanPath = location.pathname.replace(/\/index\.html$/i, "/").replace(/\.html$/i, "");
+  if (cleanPath === "") cleanPath = "/";
   var rawFile = location.pathname.split("/").pop() || "index";
   var file = rawFile.replace(/\.html$/i, "") || "index";
-  var canonical = SITE + "/" + (file === "index" ? "" : file) + (location.search || "");
+  var canonical = SITE + cleanPath + (location.search || "");
   var title = document.title;
   var desc = (document.querySelector('meta[name="description"]') || {}).content || "";
   var heroImg = abs("assets/img/og-cover.jpg");

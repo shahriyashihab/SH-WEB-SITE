@@ -4,6 +4,11 @@
 # =========================================================
 RewriteEngine On
 
+# ---- 0) index -> root (avoid /index duplicate of "/") ---------------
+RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC,OR]
+RewriteCond %{THE_REQUEST} \s/+index[\s?] [NC]
+RewriteRule ^ / [R=301,L]
+
 # ---- 1) Permanent redirect: old "/foo.html" -> "/foo" ---------------
 # Only for real .html requests (so assets are untouched). Query kept.
 RewriteCond %{THE_REQUEST} \s/+([^?\s]+?)\.html[\s?] [NC]
