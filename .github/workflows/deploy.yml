@@ -32,5 +32,9 @@ jobs:
           # Keeps a small marker file on the server so the action knows
           # which files changed since last time. This is what makes it
           # upload ONLY the changed files after the first run.
-          state-name: .ftp-deploy-sync-state.json
+          # v2 (was v1): the v1 marker was written during the first run,
+          # before the earlier manual upload, so later changes were
+          # skipped. A new marker name makes the next run re-upload
+          # every file once and then resume normal changed-only sync.
+          state-name: .ftp-deploy-sync-state-v2.json
           log-level: standard
