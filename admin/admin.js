@@ -147,7 +147,7 @@
     var s = SH.get().site;
     var f = $("companyForm");
     COMPANY_FIELDS.forEach(function (k) { f[k].value = s[k] || ""; });
-    if (s.logo) { $("logoPreview").src = s.logo; $("logoPreview").style.display = "block"; }
+    if (s.logo) { $("logoPreview").src = srcPath(s.logo); $("logoPreview").style.display = "block"; }
   }
   var pendingLogo = null;
   $("logoFile").addEventListener("change", function () { readImage(this.files[0], function (d) { pendingLogo = d; $("logoPreview").src = d; $("logoPreview").style.display = "block"; }, { ratio: 0, maxW: 600 }); });
@@ -177,7 +177,7 @@
     var c = SH.get().ceo, f = $("ceoForm");
     f.name.value = c.name || ""; f.role.value = c.role || "";
     $("ceoMessage").value = (c.message || []).join("\n");
-    $("ceoPreview").src = c.img || ""; $("ceoPreview").style.display = c.img ? "block" : "none";
+    $("ceoPreview").src = srcPath(c.img); $("ceoPreview").style.display = c.img ? "block" : "none";
   }
   $("ceoFile").addEventListener("change", function () { readImage(this.files[0], function (d) { pendingCeoImg = d; $("ceoPreview").src = d; $("ceoPreview").style.display = "block"; }, { ratio: 3 / 4, maxW: 800 }); });
   $("ceoForm").addEventListener("submit", function (e) {
@@ -194,7 +194,7 @@
     var list = SH.list("services");
     if (!list.length) { $("servicesList").innerHTML = '<p class="empty">No services yet. Click "Add Service".</p>'; return; }
     $("servicesList").innerHTML = list.map(function (s) {
-      var thumb = s.img ? '<img src="../' + esc(s.img) + '" alt="">' : '<div class="thumb-fallback">' + esc(s.icon || "S").slice(0, 4) + '</div>';
+      var thumb = s.img ? '<img src="' + esc(srcPath(s.img)) + '" alt="">' : '<div class="thumb-fallback">' + esc(s.icon || "S").slice(0, 4) + '</div>';
       return '<div class="row-item">' + thumb +
         '<div class="info"><b>' + esc(s.title) + '</b><span>' + esc(s.short || "") + '</span></div>' +
         '<div class="row-actions"><button class="btn btn-outline btn-sm" data-edit-service="' + s.id + '">Edit</button>' +
@@ -232,7 +232,7 @@
       '<div class="fld"><label>Features (one per line)</label><textarea id="mFeatures">' + esc((s.features || []).join("\n")) + '</textarea></div>' +
       '<div class="fld"><label>What\'s Included (one per line)</label><textarea id="mIncludes">' + esc((s.includes || []).join("\n")) + '</textarea></div>' +
       '<div class="fld"><label>Image</label><input type="file" id="mImgFile" accept="image/*">' +
-      '<img class="img-preview" id="mImgPreview" src="' + (s.img ? ("../" + s.img) : "") + '" style="' + (s.img ? "" : "display:none") + '"></div>';
+      '<img class="img-preview" id="mImgPreview" src="' + (s.img ? srcPath(s.img) : "") + '" style="' + (s.img ? "" : "display:none") + '"></div>';
     var pending = null;
     openModal(id ? "Edit Service" : "Add Service", html, function () {
       var obj = {
@@ -285,7 +285,7 @@
     var list = SH.list("subservices");
     if (!list.length) { $("subServicesList").innerHTML = '<p class="empty">No sub-services yet. Click "Add Sub-Service".</p>'; return; }
     $("subServicesList").innerHTML = list.map(function (s) {
-      var thumb = s.img ? '<img src="../' + esc(srcPath(s.img)) + '" alt="">' : '<div class="thumb-fallback">' + esc((s.title || "S").slice(0, 4)) + '</div>';
+      var thumb = s.img ? '<img src="' + esc(srcPath(s.img)) + '" alt="">' : '<div class="thumb-fallback">' + esc((s.title || "S").slice(0, 4)) + '</div>';
       return '<div class="row-item">' + thumb +
         '<div class="info"><b>' + esc(s.title) + '</b><span>' + esc(parentTitle(s.parent)) + ' &bull; ' + esc(s.tagline || s.short || "") + '</span></div>' +
         '<div class="row-actions"><button class="btn btn-outline btn-sm" data-edit-sub="' + s.id + '">Edit</button>' +
@@ -298,11 +298,18 @@
   }
   $("addSubService").addEventListener("click", function () { openSubServiceModal(null); });
 
+  /* Build a URL that works INSIDE /admin/ for any stored image value:
+     - data: / http(s) URLs are used as-is
+     - assets/... relative paths get a "../" prefix (admin is one level deep)
+     - bare filenames get "../assets/"
+     Returns "" for empty. */
   function srcPath(img) {
     if (!img) return "";
-    if (/^(data:|http|\.\.\/|\/)/.test(img)) return img;
-    if (/^assets\//.test(img)) return img;
-    return "assets/" + img;
+    if (/^(data:|https?:|\/\/)/.test(img)) return img;
+    if (/^\.\.\//.test(img)) return img;
+    if (/^assets\//.test(img)) return "../" + img;
+    if (/^\//.test(img)) return img;
+    return "../assets/" + img;
   }
 
   function openSubServiceModal(id) {
@@ -320,7 +327,7 @@
       '<div class="form-grid two"><div class="fld"><label>Price Text</label><input id="sPrice" value="' + esc(s.price) + '"></div>' +
       '<div class="fld"><label>Delivery / Timeline</label><input id="sDelivery" value="' + esc(s.delivery) + '"></div></div>' +
       '<div class="fld"><label>Image</label><input type="file" id="sImgFile" accept="image/*">' +
-      '<img class="img-preview" id="sImgPreview" src="' + (s.img ? "../" + srcPath(s.img).replace(/^\.\.\//, "") : "") + '" style="' + (s.img ? "" : "display:none") + '"></div>';
+      '<img class="img-preview" id="sImgPreview" src="' + (s.img ? srcPath(s.img) : "") + '" style="' + (s.img ? "" : "display:none") + '"></div>';
     var pending = null;
     openModal(id ? "Edit Sub-Service" : "Add Sub-Service", html, function () {
       var obj = {
@@ -349,7 +356,7 @@
     var list = SH.list("slides");
     if (!list.length) { $("slidesList").innerHTML = '<p class="empty">No images yet. Click "Add Image" to add one, or several to create a slideshow.</p>'; return; }
     $("slidesList").innerHTML = list.map(function (s) {
-      var thumb = s.img ? '<img src="../' + esc(srcPath(s.img)) + '" alt="">' : '<div class="thumb-fallback">IMG</div>';
+      var thumb = s.img ? '<img src="' + esc(srcPath(s.img)) + '" alt="">' : '<div class="thumb-fallback">IMG</div>';
       return '<div class="row-item">' + thumb +
         '<div class="info"><b>' + esc(s.alt || "Slide image") + '</b><span>' + esc(s.img ? String(s.img).slice(0, 48) : "") + '</span></div>' +
         '<div class="row-actions"><button class="btn btn-outline btn-sm" data-edit-slide="' + s.id + '">Edit</button>' +
@@ -366,7 +373,7 @@
     var s = id ? SH.getItem("slides", id) : { img: "", alt: "" };
     var html =
       '<div class="fld"><label>Image</label><input type="file" id="slImgFile" accept="image/*">' +
-      '<img class="img-preview" id="slImgPreview" src="' + (s.img ? "../" + srcPath(s.img).replace(/^\.\.\//, "") : "") + '" style="' + (s.img ? "" : "display:none") + '"></div>' +
+      '<img class="img-preview" id="slImgPreview" src="' + (s.img ? srcPath(s.img) : "") + '" style="' + (s.img ? "" : "display:none") + '"></div>' +
       '<div class="fld"><label>Caption / Alt text (optional)</label><input id="slAlt" value="' + esc(s.alt || "") + '"></div>' +
       '<p class="hint">Recommended: a wide banner image. Add two or more to make it slide every 2 seconds.</p>';
     var pending = null;
@@ -386,7 +393,7 @@
   function renderProductsList() {    var list = SH.list("products");
     if (!list.length) { $("productsList").innerHTML = '<p class="empty">No products yet. Click "Add Product".</p>'; return; }
     $("productsList").innerHTML = list.map(function (p) {
-      var thumb = p.img ? '<img src="../' + esc(p.img) + '" alt="">' : '<div class="thumb-fallback">' + esc(p.logo || "P") + '</div>';
+      var thumb = p.img ? '<img src="' + esc(srcPath(p.img)) + '" alt="">' : '<div class="thumb-fallback">' + esc(p.logo || "P") + '</div>';
       return '<div class="row-item">' + thumb +
         '<div class="info"><b>' + esc(p.name) + '</b><span>' + esc(p.tag || "") + '</span></div>' +
         '<div class="row-actions"><button class="btn btn-outline btn-sm" data-edit-product="' + p.id + '">Edit</button>' +
@@ -410,7 +417,7 @@
       '<div class="fld"><label>Features (one per line)</label><textarea id="pFeatures">' + esc((p.features || []).join("\n")) + '</textarea></div>' +
       '<div class="fld"><label>Price Text</label><input id="pPrice" value="' + esc(p.price) + '"></div>' +
       '<div class="fld"><label>Product Image</label><input type="file" id="pImgFile" accept="image/*">' +
-      '<img class="img-preview" id="pImgPreview" src="' + (p.img ? ("../" + p.img) : "") + '" style="' + (p.img ? "" : "display:none") + '"></div>';
+      '<img class="img-preview" id="pImgPreview" src="' + (p.img ? srcPath(p.img) : "") + '" style="' + (p.img ? "" : "display:none") + '"></div>';
     var pending = null;
     openModal(id ? "Edit Product" : "Add Product", html, function () {
       var obj = {
@@ -431,7 +438,7 @@
     var list = SH.list("team");
     if (!list.length) { $("teamList").innerHTML = '<p class="empty">No team members yet. Click "Add Team Member".</p>'; return; }
     $("teamList").innerHTML = list.map(function (m) {
-      var thumb = m.img ? '<img src="../' + esc(m.img) + '" alt="">' : '<div class="thumb-fallback">&#128100;</div>';
+      var thumb = m.img ? '<img src="' + esc(srcPath(m.img)) + '" alt="">' : '<div class="thumb-fallback">&#128100;</div>';
       return '<div class="row-item">' + thumb +
         '<div class="info"><b>' + esc(m.name) + '</b><span>' + esc(m.role) + ' &bull; profile page</span></div>' +
         '<div class="row-actions"><button class="btn btn-outline btn-sm" data-edit-member="' + m.id + '">Edit Profile</button>' +
@@ -450,7 +457,7 @@
       '<div class="form-grid two"><div class="fld"><label>Full Name</label><input id="tmName" value="' + esc(m.name) + '"></div>' +
       '<div class="fld"><label>Role / Designation</label><input id="tmRole" value="' + esc(m.role) + '"></div></div>' +
       '<div class="fld"><label>Photo</label><input type="file" id="tmImgFile" accept="image/*">' +
-      '<img class="img-preview" id="tmImgPreview" src="' + (m.img ? ("../" + m.img) : "") + '" style="' + (m.img ? "" : "display:none") + '"></div>' +
+      '<img class="img-preview" id="tmImgPreview" src="' + (m.img ? srcPath(m.img) : "") + '" style="' + (m.img ? "" : "display:none") + '"></div>' +
       '<div class="fld"><label>Biography</label><textarea id="tmBio">' + esc(m.bio) + '</textarea></div>' +
       '<div class="fld"><label>Focus Areas (one per line)</label><textarea id="tmFocus">' + esc((m.focus || []).join("\n")) + '</textarea></div>';
     var pending = null;
