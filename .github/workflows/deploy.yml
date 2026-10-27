@@ -25,7 +25,10 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
-          protocol: ftps
+          # InfinityFree does not accept FTPS (explicit TLS) on its FTP
+          # host. Plain FTP over port 21 is what their file manager and
+          # FileZilla use here, so the upload actually lands in htdocs.
+          protocol: ftp
           # Target folder on the InfinityFree server.
           # Change this one value if the remote folder is different.
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
@@ -37,4 +40,4 @@ jobs:
           # skipped. A new marker name makes the next run re-upload
           # every file once and then resume normal changed-only sync.
           state-name: .ftp-deploy-sync-state-v2.json
-          log-level: standard
+          log-level: verbose
