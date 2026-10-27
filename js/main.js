@@ -207,12 +207,43 @@
       header.classList.toggle("scrolled", window.scrollY > 10);
     }, { passive: true });
 
-    var open = function () { $("mobileMenu").classList.add("open"); $("mmOverlay").classList.add("open"); document.body.style.overflow = "hidden"; };
-    var close = function () { $("mobileMenu").classList.remove("open"); $("mmOverlay").classList.remove("open"); document.body.style.overflow = ""; };
+    var open = function () {
+      $("mobileMenu").classList.add("open");
+      $("mmOverlay").classList.add("open");
+      document.body.style.overflow = "hidden";
+      document.body.classList.add("menu-open");
+      try { history.pushState({ shMenu: true }, ""); } catch (e) {}
+    };
+    var close = function (fromHistory) {
+      $("mobileMenu").classList.remove("open");
+      $("mmOverlay").classList.remove("open");
+      document.body.style.overflow = "";
+      document.body.classList.remove("menu-open");
+      /* if the user closed it with a button/overlay, drop our history entry
+         so the browser Back button behaves normally next time */
+      if (!fromHistory) {
+        try { if (history.state && history.state.shMenu) history.back(); } catch (e) {}
+      }
+    };
     if ($("menuBtn")) $("menuBtn").addEventListener("click", open);
-    if ($("mmClose")) $("mmClose").addEventListener("click", close);
-    if ($("mmOverlay")) $("mmOverlay").addEventListener("click", close);
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+    if ($("mmClose")) $("mmClose").addEventListener("click", function () { close(false); });
+    if ($("mmOverlay")) $("mmOverlay").addEventListener("click", function () { close(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(false); });
+    /* close the menu when a menu link is tapped (navigates to a new page) */
+    var mmMenu = $("mobileMenu");
+    if (mmMenu) mmMenu.querySelectorAll("a").forEach(function (a) {
+      a.addEventListener("click", function () {
+        mmMenu.classList.remove("open");
+        if ($("mmOverlay")) $("mmOverlay").classList.remove("open");
+        document.body.style.overflow = "";
+        document.body.classList.remove("menu-open");
+      });
+    });
+    /* phone/tablet Back button: if the menu is open, close it instead of
+       leaving the site */
+    window.addEventListener("popstate", function () {
+      if (document.body.classList.contains("menu-open")) close(true);
+    });
   }
 
   /* ---------- contact form (saves a lead/order) ---------- */

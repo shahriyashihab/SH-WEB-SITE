@@ -438,3 +438,21 @@ img{max-width:100%;display:block}
 /* ================= HERO BADGE PILL (admin-editable hero badge) ================= */
 .hero .badge-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#eaf3ff;font-size:.82rem;font-weight:600;letter-spacing:.02em;margin-bottom:16px}
 .hero .badge-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:0 0 auto;box-shadow:0 0 0 4px rgba(245,130,31,.18)}
+
+/* ================= MOBILE POLISH (front-end) ================= */
+@media(max-width:560px){
+  /* iOS: keep 16px on inputs/selects so focusing does not zoom the page */
+  input,select,textarea{font-size:16px}
+  /* comfortable tap targets for primary actions */
+  .btn-lg{padding:14px 20px;font-size:1rem}
+  .btn{padding:12px 16px}
+  .menu-btn,.mm-close{min-width:44px;min-height:44px}
+  /* nav dropdown / mobile menu links comfortable */
+  .mm-link{padding:14px 16px}
+  /* prevent long words/URLs forcing horizontal scroll */
+  .container{overflow-wrap:anywhere}
+  /* hero call-to-actions stack full width */
+  .hero-cta .btn{width:100%}
+  /* badges row wraps nicely */
+  .hero-badges{gap:18px}
+}

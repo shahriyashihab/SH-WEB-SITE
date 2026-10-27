@@ -47,7 +47,7 @@
 
   /* ---------- navigation ---------- */
   var PAGES = { dashboard: "Dashboard", company: "Company Settings", hero: "Home / Hero", services: "Services", subservices: "Sub-Services", products: "Products", team: "Management Team", ceo: "CEO Profile", slides: "Slide Bar", admins: "Admin Users", orders: "Orders / Leads" };
-  function goto(page) {
+  function showPage(page) {
     document.querySelectorAll(".sb-link").forEach(function (l) { l.classList.toggle("active", l.getAttribute("data-page") === page); });
     document.querySelectorAll(".page").forEach(function (p) { p.classList.toggle("active", p.id === "page-" + page); });
     $("pageTitle").textContent = PAGES[page] || page;
@@ -64,8 +64,23 @@
     if (page === "hero") fillHero();
     if (page === "ceo") fillCeo();
   }
+  function goto(page, fromHistory) {
+    showPage(page);
+    /* remember the page in browser history so the phone/tablet Back button
+       returns to the previous admin page instead of leaving the panel */
+    if (!fromHistory) {
+      try { if (!(history.state && history.state.shPage === page)) history.pushState({ shPage: page }, ""); } catch (e) {}
+    }
+  }
   document.querySelectorAll(".sb-link[data-page]").forEach(function (l) {
     l.addEventListener("click", function () { goto(l.getAttribute("data-page")); });
+  });
+  /* Back button inside the admin panel */
+  window.addEventListener("popstate", function (e) {
+    var page = (e.state && e.state.shPage) || "dashboard";
+    if (document.getElementById("adminApp") && $("adminApp").style.display !== "none") {
+      if (document.getElementById("page-" + page)) showPage(page);
+    }
   });
   document.querySelectorAll("[data-goto]").forEach(function (b) {
     b.addEventListener("click", function () { goto(b.getAttribute("data-goto")); });
