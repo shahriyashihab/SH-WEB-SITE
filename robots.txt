@@ -1,0 +1,24 @@
+# Shahriar LLC — robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+# ---- Free-hosting safety: ask crawlers to go slowly ----
+# InfinityFree has CPU/hit limits; a slow crawl prevents suspension.
+User-agent: Googlebot
+Crawl-delay: 6
+
+User-agent: Bingbot
+Crawl-delay: 6
+
+User-agent: Googlebot-Image
+Crawl-delay: 6
+
+User-agent: AhrefsBot
+Crawl-delay: 20
+User-agent: SemrushBot
+Crawl-delay: 20
+User-agent: DotBot
+Crawl-delay: 20
+
+Sitemap: https://sprint.fast-page.org/sitemap.xml

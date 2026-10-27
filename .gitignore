@@ -1,0 +1,12 @@
+# Editor / tool folders that must NOT be deployed to the website
+.kilo/
+.vscode/
+.idea/
+
+# OS junk
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Nothing else is ignored: every website file (html, css, js, images, seo)
+# is tracked by Git so it can be deployed to InfinityFree.

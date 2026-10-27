@@ -1,0 +1,36 @@
+name: Deploy to InfinityFree
+
+# Runs every time you push to the main branch.
+# First run: uploads the whole site.
+# Later runs: only the files you actually changed are uploaded.
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  ftp-deploy:
+    name: Upload changed files to InfinityFree
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get the latest code
+        uses: actions/checkout@v4
+
+      - name: Upload only changed files over FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftps
+          # Target folder on the InfinityFree server.
+          # Change this one value if the remote folder is different.
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          # Keeps a small marker file on the server so the action knows
+          # which files changed since last time. This is what makes it
+          # upload ONLY the changed files after the first run.
+          state-name: .ftp-deploy-sync-state.json
+          log-level: standard

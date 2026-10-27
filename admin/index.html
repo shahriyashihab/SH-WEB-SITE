@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Panel | Shahriar LLC</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div class="login-wrap" id="loginWrap">
+  <form class="login-card" id="loginForm">
+    <div class="brand"><img src="../assets/img/logo.svg" alt="Shahriar LLC" />
+      <h1 style="margin-top:10px">Admin Panel</h1>
+      <p class="sub">Sign in to manage your website</p>
+    </div>
+    <div class="err" id="loginErr"></div>
+    <div class="fld"><label for="lu">Username</label><input id="lu" type="text" autocomplete="username" required /></div>
+    <div class="fld"><label for="lp">Password</label><input id="lp" type="password" autocomplete="current-password" required /></div>
+    <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px">Sign In</button>
+    <p class="sub" style="margin-top:16px">Default: <b>admin</b> / <b>shahriyar123</b></p>
+  </form>
+</div>
+
+<!-- ================= APP ================= -->
+<div class="admin" id="adminApp" style="display:none">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">
+      <img src="../assets/img/logo-white.svg" alt="" />
+      <span><b>Shahriar LLC</b><small>ADMIN PANEL</small></span>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-title">Overview</div>
+      <a class="sb-link active" data-page="dashboard"><span class="i">&#9632;</span> Dashboard</a>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-title">Website Content</div>
+      <a class="sb-link" data-page="company"><span class="i">&#9881;</span> Company Settings</a>
+      <a class="sb-link" data-page="hero"><span class="i">&#9733;</span> Home / Hero</a>
+      <a class="sb-link" data-page="services"><span class="i">&#9776;</span> Services <span class="badge" id="cServices">0</span></a>
+      <a class="sb-link" data-page="products"><span class="i">&#9635;</span> Products <span class="badge" id="cProducts">0</span></a>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-title">People</div>
+      <a class="sb-link" data-page="team"><span class="i">&#128101;</span> Management Team <span class="badge" id="cTeam">0</span></a>
+      <a class="sb-link" data-page="ceo"><span class="i">&#9873;</span> CEO Profile</a>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-title">Admin</div>
+      <a class="sb-link" data-page="admins"><span class="i">&#128100;</span> Admin Users <span class="badge" id="cAdmins">0</span></a>
+      <a class="sb-link" data-page="orders"><span class="i">&#9993;</span> Orders / Leads <span class="badge" id="cOrders">0</span></a>
+    </div>
+
+    <div class="sb-group">
+      <a class="sb-link" id="viewSite"><span class="i">&#8599;</span> View Website</a>
+      <a class="sb-link" id="logoutBtn"><span class="i">&#9099;</span> Logout</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <button class="menu-toggle" id="menuToggle">&#9776;</button>
+      <h2 id="pageTitle">Dashboard</h2>
+      <div class="spacer"></div>
+      <div class="me"><span id="meName">admin</span><div class="av" id="meAv">A</div></div>
+    </div>
+
+    <div class="content">
+
+      <!-- ===== Dashboard ===== -->
+      <section class="page active" id="page-dashboard">
+        <div class="page-h"><h1>Welcome back</h1><p>Live overview of your website — visitors and orders update in real time.</p></div>
+        <div class="grid grid-4">
+          <div class="stat-card"><div class="n" id="statVisitors">0</div><div class="l">Visitors Today</div></div>
+          <div class="stat-card accent"><div class="n" id="statViews">0</div><div class="l">Page Views Today</div></div>
+          <div class="stat-card green"><div class="n" id="statOrders">0</div><div class="l">Orders / Leads</div></div>
+          <div class="stat-card"><div class="n" id="statItems">0</div><div class="l">Total Items</div></div>
+        </div>
+        <div class="grid grid-2" style="margin-top:18px">
+          <div class="stat-card"><div class="n" id="statTotalVisitors">0</div><div class="l">Total Unique Visitors (all time)</div></div>
+          <div class="stat-card accent"><div class="n" id="statTotalViews">0</div><div class="l">Total Page Views (all time)</div></div>
+        </div>
+        <div class="card" style="margin-top:18px">
+          <h3>Visitors — last 7 days</h3>
+          <div id="visitorChart" style="display:flex;gap:8px;align-items:flex-end;padding:10px 0"></div>
+        </div>
+        <div class="grid grid-2" style="margin-top:18px">
+          <div class="card"><h3>Quick Actions</h3>
+            <div class="actions-bar">
+              <button class="btn btn-primary btn-sm" data-goto="company">Edit Company</button>
+              <button class="btn btn-outline btn-sm" data-goto="services">Manage Services</button>
+              <button class="btn btn-outline btn-sm" data-goto="products">Manage Products</button>
+              <button class="btn btn-outline btn-sm" data-goto="team">Manage Team</button>
+            </div>
+          </div>
+          <div class="card"><h3>Recent Orders / Leads</h3><div id="recentOrders"><p class="empty">No orders yet.</p></div></div>
+        </div>
+      </section>
+
+      <!-- ===== Company ===== -->
+      <section class="page" id="page-company">
+        <div class="page-h"><h1>Company Settings</h1><p>Change your company name, logo and contact details. Updates appear live on the site.</p></div>
+        <form class="card" id="companyForm">
+          <div class="form-grid two">
+            <div class="fld"><label>Company Name</label><input name="company" /></div>
+            <div class="fld"><label>Sub-line (below name)</label><input name="subCompany" /></div>
+            <div class="fld"><label>Tagline</label><input name="tagline" /></div>
+            <div class="fld"><label>Phone</label><input name="phone" /></div>
+            <div class="fld"><label>Email</label><input name="email" /></div>
+            <div class="fld"><label>Address</label><input name="address" /></div>
+            <div class="fld"><label>Facebook URL</label><input name="facebook" /></div>
+            <div class="fld"><label>Instagram URL</label><input name="instagram" /></div>
+            <div class="fld"><label>Telegram URL</label><input name="telegram" /></div>
+          </div>
+          <div class="fld"><label>Logo Image</label><input type="file" id="logoFile" accept="image/*" /><p class="hint">Leave empty to keep the built-in logo. Recommended transparent PNG/SVG.</p>
+            <img class="img-preview" id="logoPreview" style="display:none" alt="" /></div>
+          <div class="actions-bar"><button class="btn btn-primary" type="submit">Save Company Settings</button></div>
+        </form>
+      </section>
+
+      <!-- ===== Hero ===== -->
+      <section class="page" id="page-hero">
+        <div class="page-h"><h1>Home / Hero Section</h1><p>Edit the main headline and statistics.</p></div>
+        <form class="card" id="heroForm">
+          <div class="form-grid two">
+            <div class="fld"><label>Badge Text</label><input name="badge" /></div>
+            <div class="fld"><label>Headline</label><input name="title" /></div>
+          </div>
+          <div class="fld"><label>Sub-headline</label><textarea name="subtitle"></textarea></div>
+          <div class="form-grid two">
+            <div class="fld"><label>Stat 1 Number</label><input name="stat1n" /></div>
+            <div class="fld"><label>Stat 1 Label</label><input name="stat1l" /></div>
+            <div class="fld"><label>Stat 2 Number</label><input name="stat2n" /></div>
+            <div class="fld"><label>Stat 2 Label</label><input name="stat2l" /></div>
+            <div class="fld"><label>Stat 3 Number</label><input name="stat3n" /></div>
+            <div class="fld"><label>Stat 3 Label</label><input name="stat3l" /></div>
+          </div>
+          <div class="actions-bar"><button class="btn btn-primary" type="submit">Save Hero</button></div>
+        </form>
+      </section>
+
+      <!-- ===== Services ===== -->
+      <section class="page" id="page-services">
+        <div class="page-h" style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap">
+          <div><h1>Services</h1><p>Add, edit or remove services. Each service has its own detail page.</p></div>
+          <button class="btn btn-primary" id="addService">+ Add Service</button>
+        </div>
+        <div id="servicesList"></div>
+      </section>
+
+      <!-- ===== Products ===== -->
+      <section class="page" id="page-products">
+        <div class="page-h" style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap">
+          <div><h1>Products</h1><p>Manage ready-made products you sell.</p></div>
+          <button class="btn btn-primary" id="addProduct">+ Add Product</button>
+        </div>
+        <div id="productsList"></div>
+      </section>
+
+      <!-- ===== Team ===== -->
+      <section class="page" id="page-team">
+        <div class="page-h" style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap">
+          <div><h1>Management Team</h1><p>Each member has their own profile. Click Edit on a member to update their own page.</p></div>
+          <button class="btn btn-primary" id="addMember">+ Add Team Member</button>
+        </div>
+        <div id="teamList"></div>
+      </section>
+
+      <!-- ===== CEO ===== -->
+      <section class="page" id="page-ceo">
+        <div class="page-h"><h1>CEO Profile</h1><p>Edit the CEO message shown on the CEO Profile page.</p></div>
+        <form class="card" id="ceoForm">
+          <div class="form-grid two">
+            <div class="fld"><label>CEO Name</label><input name="name" /></div>
+            <div class="fld"><label>Role / Title</label><input name="role" /></div>
+          </div>
+          <div class="fld"><label>CEO Photo</label><input type="file" id="ceoFile" accept="image/*" />
+            <img class="img-preview" id="ceoPreview" alt="" /></div>
+          <div class="fld"><label>Message (one paragraph per block)</label><textarea name="message" id="ceoMessage" style="min-height:160px"></textarea><p class="hint">Put each paragraph on its own line.</p></div>
+          <div class="actions-bar"><button class="btn btn-primary" type="submit">Save CEO Profile</button></div>
+        </form>
+      </section>
+
+      <!-- ===== Admins ===== -->
+      <section class="page" id="page-admins">
+        <div class="page-h" style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap">
+          <div><h1>Admin Users</h1><p>Create multiple admin accounts with their own username and password.</p></div>
+          <button class="btn btn-primary" id="addAdmin">+ Add Admin</button>
+        </div>
+        <div id="adminsList"></div>
+      </section>
+
+      <!-- ===== Orders ===== -->
+      <section class="page" id="page-orders">
+        <div class="page-h" style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap">
+          <div><h1>Orders / Leads</h1><p>Every order and message submitted through the website, live from Firebase.</p></div>
+          <div class="row-actions">
+            <button class="btn btn-outline btn-sm" id="ordersRefresh">&#8635; Refresh</button>
+            <button class="btn btn-outline btn-sm" id="ordersExport">&#11015; Export CSV</button>
+          </div>
+        </div>
+        <div id="ordersList"></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL ================= -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-head"><h3 id="modalTitle">Edit</h3><button class="modal-close" id="modalClose">&times;</button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" id="modalCancel">Cancel</button>
+      <button class="btn btn-primary" id="modalSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../js/config.js"></script>
+<script src="../js/shdb.js"></script>
+<script src="../js/stats.js"></script>
+<script src="../js/store.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
