@@ -502,17 +502,16 @@
       swapField("address", s.address);
     }
 
-    /* ---- social links (footer Fb / In / Yt + profile-social) ---- */
+    /* ---- social links (footer Fb / Ig / Tg / In / Yt + profile-social) ---- */
     var social = { Facebook: s.facebook, Instagram: s.instagram, Telegram: s.telegram, LinkedIn: s.linkedin, YouTube: s.youtube };
     document.querySelectorAll(".social a, .profile-social a").forEach(function (a) {
       var label = (a.getAttribute("aria-label") || a.textContent || "").trim().toLowerCase();
       var url = null;
-      if (/fb|facebook/.test(label)) url = social.Facebook;
-      else if (/in|linkedin/.test(label)) url = social.LinkedIn;
-      else if (/yt|youtube/.test(label)) url = social.YouTube;
-      else if (/ig|insta/.test(label)) url = social.Instagram;
-      else if (/tg|telegram/.test(label)) url = social.Telegram;
-      else if (a.textContent.trim() === "@") url = social.Telegram;
+      if (/facebook|^fb$/.test(label)) url = social.Facebook;
+      else if (/instagram|^ig$/.test(label)) url = social.Instagram;
+      else if (/telegram|^tg$/.test(label)) url = social.Telegram;
+      else if (/linkedin|^in$/.test(label)) url = social.LinkedIn;
+      else if (/youtube|^yt$/.test(label)) url = social.YouTube;
       if (url && url !== "#") { a.setAttribute("href", url); a.setAttribute("target", "_blank"); a.setAttribute("rel", "noopener"); }
     });
 
@@ -570,6 +569,16 @@
     /* ---- tagline (footer brand line) ---- */
     if (s.tagline) {
       document.querySelectorAll(".footer-tagline").forEach(function (el) { el.textContent = s.tagline; });
+    }
+
+    /* ---- footer copyright: show company + sub-company ---- */
+    if (s.company) {
+      var co = s.company + (s.subCompany ? " " + s.subCompany : "");
+      document.querySelectorAll(".footer-bottom span").forEach(function (el) {
+        if (/all rights reserved/i.test(el.textContent)) {
+          el.innerHTML = "&copy; " + new Date().getFullYear() + " " + esc(co) + ". All rights reserved.";
+        }
+      });
     }
 
     /* ---- logo image (if admin uploaded one) ---- */
