@@ -1,0 +1,5 @@
+# Shahriar LLC — clean URL test (temporary)
+RewriteEngine On
+# If a request for /foo exists as /foo.html, serve it
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.+)$ $1.html [L]
