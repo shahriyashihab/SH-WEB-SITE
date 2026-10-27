@@ -83,7 +83,28 @@ function footer() {
 
 function page(p) {
   const url = SITE + "/seo/" + p.slug;
-  const desc = (p.intro || p.body || "").slice(0, 155);
+
+  /* ---- SEO title: keep total under ~60 chars including the brand ---- */
+  const BRAND = " | Shahriar LLC";
+  let h1 = p.h1;
+  let title = h1 + BRAND;
+  if (title.length > 60) title = h1.slice(0, 60 - BRAND.length - 1).replace(/\s+\S*$/, "") + BRAND;
+
+  /* ---- meta description: prefer 70-158 chars.
+     Build from intro; if too short, append the first sentence of body. ---- */
+  function firstSentence(t) {
+    t = String(t || "").replace(/\s+/g, " ").trim();
+    const m = t.match(/^(.+?[.!?])\s/);
+    return m ? m[1] : t;
+  }
+  let desc = (p.intro || "").replace(/\s+/g, " ").trim();
+  if (desc.length < 70 && p.body) {
+    const add = firstSentence(p.body);
+    if (add && desc.indexOf(add.slice(0, 20)) === -1) desc = (desc + " " + add).trim();
+  }
+  if (desc.length < 70 && p.kw) desc = (desc + " " + p.kw + " by Shahriar LLC.").trim();
+  if (desc.length > 158) desc = desc.slice(0, 155).replace(/\s+\S*$/, "") + "...";
+
   const cat = CAT_LABEL[p.cat] || "Info";
   const points = (p.points || []).map(x => `<li>${esc(x)}</li>`).join("");
   const related = PAGES.filter(x => x.cat === p.cat && x.slug !== p.slug).slice(0, 6)
@@ -108,7 +129,7 @@ function page(p) {
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>${esc(p.h1)} | Shahriar LLC</title>
+<title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}" />
 <meta name="keywords" content="${esc(p.kw)}, software company Bangladesh, Shahriar LLC, Dhaka" />
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
@@ -234,6 +255,16 @@ PAGES.forEach(p => {
 <meta name="description" content="Guides, solutions, products, industries and locations served by Shahriar LLC — a software company in Bangladesh since 2007." />
 <link rel="canonical" href="${SITE}/seo/" />
 <meta name="robots" content="index, follow" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Shahriar LLC" />
+<meta property="og:title" content="Resources &amp; Solutions | Shahriar LLC" />
+<meta property="og:description" content="Guides, solutions, products, industries and locations served by Shahriar LLC — a software company in Bangladesh since 2007." />
+<meta property="og:url" content="${SITE}/seo/" />
+<meta property="og:image" content="${SITE}/assets/img/og-cover.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Resources &amp; Solutions | Shahriar LLC" />
+<meta name="twitter:description" content="Guides, solutions, products, industries and locations served by Shahriar LLC." />
+<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", name: "Resources & Solutions", url: SITE + "/seo/", isPartOf: { "@type": "WebSite", name: "Shahriar LLC", url: SITE + "/" }, about: { "@type": "Organization", name: "Shahriar LLC", url: SITE + "/" } })}</script>
 <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
 <link rel="stylesheet" href="../css/style.css" />
 </head>
@@ -250,7 +281,7 @@ ${footer()}
 </body>
 </html>
 `;
-  fs.writeFileSync(path.join(OUT, "/"), index, "utf8");
+  fs.writeFileSync(path.join(OUT, "index.html"), index, "utf8");
 })();
 
 // ---- generate the mega sitemap ----
@@ -260,6 +291,21 @@ ${footer()}
   let urls = CORE.map(u => `  <url><loc>${SITE}/${u}</loc><lastmod>2026-10-25</lastmod><changefreq>weekly</changefreq><priority>${u === "" ? "1.0" : "0.8"}</priority></url>`).join("\n");
   urls += "\n" + PAGES.map(p => `  <url><loc>${SITE}/seo/${p.slug}</loc><lastmod>2026-10-25</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>`).join("\n");
   urls += `\n  <url><loc>${SITE}/seo/</loc><lastmod>2026-10-25</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>`;
+
+  /* ---- product & service detail pages (query URLs, matching their
+     self-referential canonical) so Google can discover every product
+     and service. Sub-services are admin-driven and intentionally left
+     to normal crawling. ---- */
+  try {
+    global.window = {};
+    require(path.join(ROOT, "js", "catalog.js"));
+    const CAT = global.window.CATALOG || {};
+    const products = Object.keys(CAT).filter(k => CAT[k].type === "Product");
+    const svcSlugs = Object.keys(CAT).filter(k => CAT[k].type === "Service");
+    urls += "\n" + products.map(k => `  <url><loc>${SITE}/detail?item=${k}</loc><lastmod>2026-10-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>`).join("\n");
+    urls += "\n" + svcSlugs.map(k => `  <url><loc>${SITE}/service?item=${k}</loc><lastmod>2026-10-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>`).join("\n");
+  } catch (e) { /* catalog optional */ }
+
   const sm = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
   fs.writeFileSync(path.join(ROOT, "sitemap.xml"), sm, "utf8");
 })();
