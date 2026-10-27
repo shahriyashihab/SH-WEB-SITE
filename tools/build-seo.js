@@ -8,6 +8,8 @@ const path = require("path");
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "seo");
 const SITE = "https://sprint.fast-page.org";
+/* bump this whenever you want every browser to refetch JS/CSS */
+const VERSION = process.env.SH_VERSION || "20261028a";
 
 // load catalog
 global.window = {};
@@ -145,7 +147,7 @@ function page(p) {
 <meta name="twitter:title" content="${esc(p.h1)}" />
 <meta name="twitter:description" content="${esc(desc)}" />
 <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
-<link rel="stylesheet" href="../css/style.css" />
+<link rel="stylesheet" href="../css/style.css?v=${VERSION}" />
 <script type="application/ld+json">${jsonld}</script>
 </head>
 <body>
@@ -218,10 +220,10 @@ ${header()}
 
 ${footer()}
 
-<script src="../js/config.js"></script>
-<script src="../js/shdb.js"></script>
-<script src="../js/store.js"></script>
-<script src="../js/main.js"></script>
+<script src="../js/config.js?v=${VERSION}"></script>
+<script src="../js/shdb.js?v=${VERSION}"></script>
+<script src="../js/store.js?v=${VERSION}"></script>
+<script src="../js/main.js?v=${VERSION}"></script>
 </body>
 </html>
 `;
@@ -266,7 +268,7 @@ PAGES.forEach(p => {
 <meta name="twitter:description" content="Guides, solutions, products, industries and locations served by Shahriar LLC." />
 <script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", name: "Resources & Solutions", url: SITE + "/seo/", isPartOf: { "@type": "WebSite", name: "Shahriar LLC", url: SITE + "/" }, about: { "@type": "Organization", name: "Shahriar LLC", url: SITE + "/" } })}</script>
 <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
-<link rel="stylesheet" href="../css/style.css" />
+<link rel="stylesheet" href="../css/style.css?v=${VERSION}" />
 </head>
 <body>
 ${header()}

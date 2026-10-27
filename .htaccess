@@ -1,6 +1,6 @@
 # =========================================================
-#  Shahriar LLC — Clean URLs (no .html) + permanent redirects
-#  Apache / InfinityFree (mod_rewrite). Tested live.
+#  Shahriar LLC - Clean URLs (no .html) + redirects + cache
+#  Apache / InfinityFree (mod_rewrite).
 # =========================================================
 RewriteEngine On
 
@@ -10,7 +10,6 @@ RewriteCond %{THE_REQUEST} \s/+index[\s?] [NC]
 RewriteRule ^ / [R=301,L]
 
 # ---- 1) Permanent redirect: old "/foo.html" -> "/foo" ---------------
-# Only for real .html requests (so assets are untouched). Query kept.
 RewriteCond %{THE_REQUEST} \s/+([^?\s]+?)\.html[\s?] [NC]
 RewriteRule ^ /%1 [R=301,L]
 
@@ -24,3 +23,28 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteCond %{REQUEST_FILENAME}/index.html -f
 RewriteRule ^(.+?)/?$ $1/index.html [L]
+
+# =========================================================
+#  Cache policy: visitors always get the newest content
+#  after a normal refresh (no cookie/cache clearing needed).
+# =========================================================
+<IfModule mod_headers.c>
+  # HTML pages + the JSON/XML feeds: never cache, always revalidate.
+  <FilesMatch "\.(html|htm|json|xml|txt)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # JS / CSS: must revalidate every time (they carry a ?v= version tag,
+  # but revalidation guarantees the newest file is fetched).
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "no-cache, must-revalidate, max-age=0"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # Images / fonts: safe to cache for a while (rarely change).
+  <FilesMatch "\.(jpg|jpeg|png|gif|svg|webp|ico|woff2?|ttf|eot)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
