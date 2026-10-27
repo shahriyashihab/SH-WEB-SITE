@@ -551,14 +551,25 @@
       document.querySelectorAll(".hero h1").forEach(function (el) {
         if (h.title) el.innerHTML = esc(h.title).replace(/(software company)/i, '<span style="color:var(--accent)">$1</span>').replace(/(Top 1%)/i, '<span style="color:var(--accent)">$1</span>');
       });
-      document.querySelectorAll(".hero .lead").forEach(function (el) { if (h.subtitle) el.textContent = h.subtitle; });
+      /* hero lead paragraph (index uses a bare <p>, older pages use .lead) */
+      document.querySelectorAll(".hero .lead, .hero p").forEach(function (el) {
+        if (el.closest(".hero-badges") || el.closest(".hero-cta")) return;
+        if (h.subtitle) el.textContent = h.subtitle;
+      });
       document.querySelectorAll(".hero-badges").forEach(function (wrap) {
         wrap.innerHTML = '<div><strong>' + esc(h.stat1n || "") + '</strong><span>' + esc(h.stat1l || "") + '</span></div>' +
           '<div><strong>' + esc(h.stat2n || "") + '</strong><span>' + esc(h.stat2l || "") + '</span></div>' +
           '<div><strong>' + esc(h.stat3n || "") + '</strong><span>' + esc(h.stat3l || "") + '</span></div>';
       });
-      var badge = document.querySelector(".badge-pill");
-      if (badge && h.badge) badge.innerHTML = '<span class="dot"></span>' + esc(h.badge);
+      /* badge pill (may not exist on every hero) */
+      document.querySelectorAll(".hero .badge-pill, .hero .hero-badge").forEach(function (badge) {
+        if (h.badge) badge.innerHTML = '<span class="dot"></span>' + esc(h.badge);
+      });
+    }
+
+    /* ---- tagline (footer brand line) ---- */
+    if (s.tagline) {
+      document.querySelectorAll(".footer-tagline").forEach(function (el) { el.textContent = s.tagline; });
     }
 
     /* ---- logo image (if admin uploaded one) ---- */
