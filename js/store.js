@@ -114,13 +114,21 @@
 
   function save(opts) {
     try { localStorage.setItem(KEY, JSON.stringify(DATA)); } catch (e) { console.warn("save failed", e); }
-    /* push to the free real-time cloud + other open tabs */
-    if (window.SHDB && !(opts && opts.remote)) {
-      window.SHDB.push(DATA);
-    } else if (USE_FB && FB_URL) {
-      fetch(FB_URL.replace(/\/$/, "") + "/content.json", {
-        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(DATA)
-      }).catch(function () {});
+    /* Push to the cloud only for real edits:
+         - opts.local  -> local-only (visit tracking), never push
+         - opts.remote -> applying a cloud snapshot, never push back
+         - otherwise   -> an editor action (public SH.save/upsert/remove)
+       A plain visitor page-load uses opts.local, so it can never
+       overwrite the admin's saved content in the cloud. */
+    var push = !(opts && (opts.local || opts.remote));
+    if (push) {
+      if (window.SHDB && !(opts && opts.remote)) {
+        window.SHDB.push(DATA);
+      } else if (USE_FB && FB_URL) {
+        fetch(FB_URL.replace(/\/$/, "") + "/content.json", {
+          method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(DATA)
+        }).catch(function () {});
+      }
     }
     try { window.dispatchEvent(new CustomEvent("sh:change")); } catch (e) {}
     return true;
@@ -199,10 +207,10 @@
     if (!sessionStorage.getItem(vk)) {
       sessionStorage.setItem(vk, "1");
       DATA.stats.visitors = (DATA.stats.visitors || 0) + 1;
-      save();
+      save({ local: true });
     }
     DATA.stats.pageviews = (DATA.stats.pageviews || 0) + 1;
-    save();
+    save({ local: true });
   } catch (e) {}
 
   /* ---------- go live (free real-time sync) ---------- */
