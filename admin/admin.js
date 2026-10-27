@@ -129,10 +129,12 @@
   }
 
   /* ---------- COMPANY ---------- */
+  var COMPANY_FIELDS = ["company", "subCompany", "tagline", "phone", "email", "address", "facebook", "instagram", "telegram", "linkedin", "youtube"];
+
   function fillCompany() {
     var s = SH.get().site;
     var f = $("companyForm");
-    ["company", "subCompany", "tagline", "phone", "email", "address", "facebook", "instagram", "telegram"].forEach(function (k) { f[k].value = s[k] || ""; });
+    COMPANY_FIELDS.forEach(function (k) { f[k].value = s[k] || ""; });
     if (s.logo) { $("logoPreview").src = s.logo; $("logoPreview").style.display = "block"; }
   }
   var pendingLogo = null;
@@ -140,7 +142,7 @@
   $("companyForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var s = SH.get().site, f = e.target;
-    ["company", "subCompany", "tagline", "phone", "email", "address", "facebook", "instagram", "telegram"].forEach(function (k) { s[k] = f[k].value.trim(); });
+    COMPANY_FIELDS.forEach(function (k) { s[k] = f[k].value.trim(); });
     if (pendingLogo) { s.logo = pendingLogo; pendingLogo = null; }
     SH.save(); toast("Company settings saved \u2014 now live on the site"); renderDashboard();
   });

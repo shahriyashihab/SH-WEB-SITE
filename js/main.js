@@ -99,6 +99,16 @@
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
 
   /* ---------- store-aware data getters ---------- */
+  function livePhone() {
+    if (window.SH) { var s = SH.get().site || {}; if (s.phone) return s.phone; }
+    return "+880 1958-633202";
+  }
+  function livePhoneDial() { return String(livePhone()).replace(/[^\d+]/g, ""); }
+  function liveEmail() {
+    if (window.SH) { var s = SH.get().site || {}; if (s.email) return s.email; }
+    return "info@sprint.fast-page.org";
+  }
+
   function servicesData() {
     if (window.SH && SH.list("services").length) {
       return SH.list("services").map(function (s) { return [s.title, s.icon, s.img, s.color, s.id, s.short]; });
@@ -145,7 +155,7 @@
           '<div class="pc-frame"><img src="' + esc(src) + '" alt="' + esc(p.name) + '" loading="lazy"></div>' +
           '</a>' +
           '<div class="pc-actions">' +
-          '<a href="tel:+8801958633202" class="btn-product btn-call">&#128222; Call Now</a>' +
+          '<a href="tel:' + livePhoneDial() + '" class="btn-product btn-call">&#128222; Call Now</a>' +
           '<a href="detail.html?item=' + p.slug + '" class="btn-product btn-demo">&#128433; Try Demo</a>' +
           '</div></article>';
       }).join("");
@@ -273,22 +283,153 @@
   });
 
   /* ---------- live content binding ---------- */
+  /* Built-in seed values that appear hard-coded in the HTML.
+     They are the initial "from" side of every search-and-replace so
+     admin edits propagate to every page (topbar, footer, contact
+     blocks). CURRENT remembers the last value we wrote so a second
+     admin edit replaces the previous value, not just the seed. */
+  var SEED = {
+    phone: "+880 1958-633202",
+    email: "info@sprint.fast-page.org",
+    address: "Dhaka, Bangladesh",
+    company: "Shahriar LLC",
+    subCompany: "BD LTD"
+  };
+  var CURRENT = { phone: SEED.phone, email: SEED.email, address: SEED.address, company: SEED.company };
+
+  /* Replace a literal text value inside text nodes only (keeps markup). */
+  function replaceText(oldVal, newVal) {
+    if (!oldVal || !newVal || oldVal === newVal) return;
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while ((node = walker.nextNode())) {
+      if (node.nodeValue && node.nodeValue.indexOf(oldVal) !== -1) {
+        node.nodeValue = node.nodeValue.split(oldVal).join(newVal);
+      }
+    }
+  }
+
+  /* Swap an old live value for a new one, trying both the seed text and
+     whatever value is currently displayed. Returns nothing. */
+  function swapField(key, newVal) {
+    if (!newVal) return;
+    var from = [];
+    if (SEED[key] && SEED[key] !== newVal) from.push(SEED[key]);
+    if (CURRENT[key] && CURRENT[key] !== newVal && from.indexOf(CURRENT[key]) === -1) from.push(CURRENT[key]);
+    from.forEach(function (oldVal) { replaceText(oldVal, newVal); });
+    CURRENT[key] = newVal;
+  }
+
+  /* Point every tel: link at the live phone number. */
+  function syncTelLinks(phone) {
+    if (!phone) return;
+    var dial = String(phone).replace(/[^\d+]/g, "");
+    document.querySelectorAll('a[href^="tel:"]').forEach(function (a) {
+      a.setAttribute("href", "tel:" + dial);
+    });
+  }
+
+  /* Point every mailto: link and plain email text at the live email. */
+  function syncMailLinks(email) {
+    if (!email) return;
+    document.querySelectorAll('a[href^="mailto:"]').forEach(function (a) {
+      a.setAttribute("href", "mailto:" + email);
+    });
+  }
+
+  /* Fill any element that opts in with data-sh="phone|email|address|company".
+     Optional data-sh-href="tel:|mailto:" turns it into a working link. */
+  function syncDataAttrs(s) {
+    document.querySelectorAll("[data-sh]").forEach(function (el) {
+      var k = el.getAttribute("data-sh");
+      var v = s[k];
+      if (v == null || v === "") return;
+      var scheme = el.getAttribute("data-sh-href");
+      if (scheme) {
+        var hrefVal = scheme === "tel:" ? String(v).replace(/[^\d+]/g, "") : String(v);
+        el.setAttribute("href", scheme + hrefVal);
+        if (!el.textContent.trim()) el.textContent = v;
+      } else if (el.tagName === "IMG") {
+        el.setAttribute("src", v);
+        el.setAttribute("alt", s.company || "");
+      } else {
+        el.textContent = v;
+      }
+    });
+  }
+
+  /* Apply live content from the store to every visible element. */
   function applyLiveContent() {
     if (!window.SH) return;
     var d = SH.get();
-
-    /* company + contact */
     var s = d.site || {};
-    document.querySelectorAll('a[href="contact.html"]').forEach(function () {});
-    /* replace brand text anywhere it appears in plain text */
-    if (s.phone) {
-      document.querySelectorAll(".topbar span, #footerPhone, .detail-card").forEach(function () {});
-    }
-    /* header/footer contact + brand via data attributes if present */
-    var phones = document.querySelectorAll('a[href^="tel:"]');
-    phones.forEach(function (a) { if (s.phone) a.setAttribute("href", "tel:" + s.phone.replace(/\s+/g, "")); });
 
-    /* hero */
+    /* ---- brand / company name (logo alt, footer copyright, etc.) ---- */
+    if (s.company) {
+      swapField("company", s.company);
+    }
+
+    /* ---- phone: literal text + tel: links ---- */
+    if (s.phone) {
+      swapField("phone", s.phone);
+      syncTelLinks(s.phone);
+    }
+
+    /* ---- email: literal text + mailto: links ---- */
+    if (s.email) {
+      swapField("email", s.email);
+      syncMailLinks(s.email);
+    }
+
+    /* ---- address ---- */
+    if (s.address) {
+      swapField("address", s.address);
+    }
+
+    /* ---- social links (footer Fb / In / Yt + profile-social) ---- */
+    var social = { Facebook: s.facebook, Instagram: s.instagram, Telegram: s.telegram, LinkedIn: s.linkedin, YouTube: s.youtube };
+    document.querySelectorAll(".social a, .profile-social a").forEach(function (a) {
+      var label = (a.getAttribute("aria-label") || a.textContent || "").trim().toLowerCase();
+      var url = null;
+      if (/fb|facebook/.test(label)) url = social.Facebook;
+      else if (/in|linkedin/.test(label)) url = social.LinkedIn;
+      else if (/yt|youtube/.test(label)) url = social.YouTube;
+      else if (/ig|insta/.test(label)) url = social.Instagram;
+      else if (/tg|telegram/.test(label)) url = social.Telegram;
+      else if (a.textContent.trim() === "@") url = social.Telegram;
+      if (url && url !== "#") { a.setAttribute("href", url); a.setAttribute("target", "_blank"); a.setAttribute("rel", "noopener"); }
+    });
+
+    /* ---- contact summary line in the topbar ---- */
+    var topContact = document.querySelector(".topbar span");
+    if (topContact && (s.phone || s.email)) {
+      topContact.innerHTML = "&#128222; " + esc(s.phone || SEED.phone) + " &nbsp;|&nbsp; &#9993; " + esc(s.email || SEED.email);
+    }
+
+    /* ---- footer "Get In Touch" list ---- */
+    document.querySelectorAll(".footer-links").forEach(function (ul) {
+      var head = ul.previousElementSibling;
+      if (!head || (head.textContent || "").trim().toLowerCase() !== "get in touch") return;
+      var lis = ul.querySelectorAll("li");
+      if (lis[0] && s.phone) lis[0].innerHTML = "&#128222; " + esc(s.phone);
+      if (lis[1] && s.email) lis[1].innerHTML = "&#9993; " + esc(s.email);
+      if (lis[2] && s.address) lis[2].innerHTML = "&#127968; " + esc(s.address);
+    });
+
+    /* ---- contact / order page info cards ---- */
+    document.querySelectorAll(".ci").forEach(function (ci) {
+      var p = ci.querySelector("p");
+      var label = ((ci.querySelector("span") || {}).textContent || "").toLowerCase();
+      if (!p) return;
+      if (/phone|whatsapp|mobile/.test(label) && s.phone) p.textContent = s.phone;
+      else if (/email|mail/.test(label) && s.email) p.textContent = s.email;
+      else if (/location|address|office/.test(label) && s.address) p.textContent = s.address;
+    });
+
+    /* ---- explicit opt-in bindings ---- */
+    syncDataAttrs(s);
+
+    /* ---- hero ---- */
     if (d.hero && document.querySelector(".hero h1")) {
       var h = d.hero;
       document.querySelectorAll(".hero h1").forEach(function (el) {
@@ -304,9 +445,16 @@
       if (badge && h.badge) badge.innerHTML = '<span class="dot"></span>' + esc(h.badge);
     }
 
-    /* logo image (if admin uploaded one) */
+    /* ---- logo image (if admin uploaded one) ---- */
     if (s.logo) {
       document.querySelectorAll("img[src*='logo.svg']").forEach(function (im) { im.src = s.logo; });
+    }
+
+    /* ---- document title / brand text in browser tab ---- */
+    if (s.company) {
+      [SEED.company, CURRENT.company].forEach(function (oldName) {
+        if (oldName && oldName !== s.company) document.title = document.title.split(oldName).join(s.company);
+      });
     }
   }
 })();

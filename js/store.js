@@ -43,7 +43,7 @@
         phone: "+880 1958-633202",
         email: "info@sprint.fast-page.org",
         address: "Dhaka, Bangladesh",
-        facebook: "#", instagram: "#", telegram: "#",
+        facebook: "#", instagram: "#", telegram: "#", linkedin: "#", youtube: "#",
         logo: ""
       },
       hero: {
