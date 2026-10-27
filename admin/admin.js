@@ -146,7 +146,10 @@
   function fillCompany() {
     var s = SH.get().site;
     var f = $("companyForm");
-    COMPANY_FIELDS.forEach(function (k) { f[k].value = s[k] || ""; });
+    COMPANY_FIELDS.forEach(function (k) {
+      var el = f.elements[k] || f.querySelector('[name="' + k + '"]');
+      if (el) el.value = s[k] || "";
+    });
     if (s.logo) { $("logoPreview").src = srcPath(s.logo); $("logoPreview").style.display = "block"; }
   }
   var pendingLogo = null;
@@ -154,7 +157,10 @@
   $("companyForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var s = SH.get().site, f = e.target;
-    COMPANY_FIELDS.forEach(function (k) { s[k] = f[k].value.trim(); });
+    COMPANY_FIELDS.forEach(function (k) {
+      var el = f.elements[k] || f.querySelector('[name="' + k + '"]');
+      if (el) s[k] = el.value.trim();
+    });
     if (pendingLogo) { s.logo = pendingLogo; pendingLogo = null; }
     SH.save(); toast("Company settings saved \u2014 now live on the site"); renderDashboard();
   });
@@ -162,12 +168,12 @@
   /* ---------- HERO ---------- */
   function fillHero() {
     var h = SH.get().hero, f = $("heroForm");
-    Object.keys(h).forEach(function (k) { if (f[k]) f[k].value = h[k]; });
+    Object.keys(h).forEach(function (k) { var el = f.elements[k]; if (el) el.value = h[k]; });
   }
   $("heroForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var h = SH.get().hero, f = e.target;
-    Object.keys(h).forEach(function (k) { if (f[k]) h[k] = f[k].value; });
+    Object.keys(h).forEach(function (k) { var el = f.elements[k]; if (el) h[k] = el.value; });
     SH.save(); toast("Hero section saved \u2014 now live");
   });
 
@@ -175,15 +181,19 @@
   var pendingCeoImg = null;
   function fillCeo() {
     var c = SH.get().ceo, f = $("ceoForm");
-    f.name.value = c.name || ""; f.role.value = c.role || "";
+    var n = f.elements["name"], r = f.elements["role"];
+    if (n) n.value = c.name || "";
+    if (r) r.value = c.role || "";
     $("ceoMessage").value = (c.message || []).join("\n");
     $("ceoPreview").src = srcPath(c.img); $("ceoPreview").style.display = c.img ? "block" : "none";
   }
   $("ceoFile").addEventListener("change", function () { readImage(this.files[0], function (d) { pendingCeoImg = d; $("ceoPreview").src = d; $("ceoPreview").style.display = "block"; }, { ratio: 3 / 4, maxW: 800 }); });
   $("ceoForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    var c = SH.get().ceo;
-    c.name = e.target.name.value; c.role = e.target.role.value;
+    var c = SH.get().ceo, f = e.target;
+    var n = f.elements["name"], r = f.elements["role"];
+    c.name = n ? n.value : (c.name || "");
+    c.role = r ? r.value : (c.role || "");
     c.message = $("ceoMessage").value.split("\n").map(function (x) { return x.trim(); }).filter(Boolean);
     if (pendingCeoImg) { c.img = pendingCeoImg; pendingCeoImg = null; }
     SH.save(); toast("CEO profile saved");
