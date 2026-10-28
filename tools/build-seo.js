@@ -222,6 +222,7 @@ ${footer()}
 
 <script src="../js/config.js?v=${VERSION}"></script>
 <script src="../js/shdb.js?v=${VERSION}"></script>
+<script src="../js/stats.js?v=${VERSION}"></script>
 <script src="../js/store.js?v=${VERSION}"></script>
 <script src="../js/main.js?v=${VERSION}"></script>
 </body>
@@ -280,6 +281,11 @@ ${header()}
   </div></section>
 </main>
 ${footer()}
+<script src="../js/config.js?v=${VERSION}"></script>
+<script src="../js/shdb.js?v=${VERSION}"></script>
+<script src="../js/stats.js?v=${VERSION}"></script>
+<script src="../js/store.js?v=${VERSION}"></script>
+<script src="../js/main.js?v=${VERSION}"></script>
 </body>
 </html>
 `;

@@ -62,6 +62,7 @@
       subservices: [],
       products: [],
       team: [],
+      testimonials: [],
       ceo: { name: "", role: "", img: "", message: [] },
       admins: [],
       slides: [],
@@ -107,11 +108,19 @@
        overwrite the admin's saved content in the cloud. */
     var push = !(opts && (opts.local || opts.remote));
     if (push) {
+      /* Never write orders or visit-only stats into the shared content
+         node. Orders live in their own cloud node (messagesPath) and
+         would otherwise be clobbered by whichever device saved last. */
+      var payload = {};
+      Object.keys(DATA).forEach(function (k) {
+        if (k === "orders" || k === "stats") return;
+        payload[k] = DATA[k];
+      });
       if (window.SHDB && !(opts && opts.remote)) {
-        window.SHDB.push(DATA);
+        window.SHDB.push(payload);
       } else if (USE_FB && FB_URL) {
         fetch(FB_URL.replace(/\/$/, "") + "/content.json", {
-          method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(DATA)
+          method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
         }).catch(function () {});
       }
     }
@@ -129,7 +138,12 @@
        admins/orders): replaced wholesale. A null/absent cloud value
        becomes an EMPTY array (this is what makes delete propagate). */
   var TEMPLATE = seed();
-  var COLLECTIONS = ["services", "subservices", "products", "team", "portfolio", "slides", "admins", "orders"];
+  /* Collections that live inside the shared cloud CONTENT node and are
+     REPLACED wholesale by each snapshot (so deletes propagate).
+     "orders" is intentionally NOT here: orders live in a separate cloud
+     node (messagesPath) and are merged via the messages channel — if it
+     were listed here every content poll would wipe locally-held orders. */
+  var COLLECTIONS = ["services", "subservices", "products", "team", "portfolio", "slides", "admins", "testimonials"];
   var OBJECTS = { site: true, hero: true, stats: true, ceo: true };
 
   function mergeRemote(remote) {
@@ -159,7 +173,12 @@
 
   /* ---------- live sync bootstrap (tabs + cloud) ---------- */
   function startLive() {
-    if (!window.SHDB) return;
+    if (!window.SHDB) {
+      /* no cloud layer loaded: run local-only but still unlock the UI */
+      READY = true;
+      try { window.dispatchEvent(new CustomEvent("sh:ready")); } catch (e) {}
+      return;
+    }
     /* initial cloud read: cloud content wins if it exists */
     window.SHDB.pull(function (remote) {
       if (remote) { mergeRemote(remote); return; }
@@ -183,7 +202,9 @@
       }
       if (msg.data.__message) {
         var msgs = DATA.orders || (DATA.orders = []);
-        msgs.push(msg.data.__message);
+        var om = msg.data.__message;
+        var dup = om && om.id && msgs.some(function (x) { return x && x.id === om.id; });
+        if (!dup) msgs.push(om);
         cacheWrite();
         try { window.dispatchEvent(new CustomEvent("sh:change")); } catch (e) {}
         return;
@@ -204,7 +225,7 @@
     /* persist to the local cache only (no cloud push) */
     persistLocal: function () { cacheWrite(); },
     /* generic collection helpers */
-    list: function (coll) { return DATA[coll] || []; },
+    list: function (coll) { var a = DATA[coll]; return Array.isArray(a) ? a : []; },
     getItem: function (coll, id) {
       var a = DATA[coll] || [];
       for (var i = 0; i < a.length; i++) if (a[i].id === id) return a[i];

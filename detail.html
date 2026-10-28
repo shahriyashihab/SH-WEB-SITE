@@ -70,7 +70,7 @@
     <div class="container">
       <div class="detail-layout">
         <div class="detail-main">
-          <div class="detail-img"><img id="dImg" src="assets/img/svc-web.jpg" alt="" /></div>
+          <div class="detail-img" id="dImgWrap"><img id="dImg" alt="" /></div>
           <span class="detail-badge" id="dType">Service</span>
           <h2 id="dHeading"></h2>
           <p class="detail-overview" id="dOverview"></p>
@@ -174,16 +174,33 @@
   function render(){
     var item=resolve();
     if(!item){
+      /* Cloud not ready yet (or a genuinely missing item). Show the
+         not-found message WITHOUT destroying the layout — the elements
+         must survive so a later render (when the cloud snapshot arrives)
+         can fill them in. */
+      if(window.SH && !SH.ready()) return;
       $("dTitle").textContent="Not found";
-      document.querySelector(".detail-layout").innerHTML='<p style="grid-column:1/-1;color:var(--muted)">Sorry, this item could not be found. <a style="color:var(--brand)" href="services">Browse all services</a>.</p>';
+      var layout=document.querySelector(".detail-layout");
+      var msg=document.getElementById("dNotFound");
+      if(!msg){
+        msg=document.createElement("p");
+        msg.id="dNotFound";
+        msg.style.cssText="grid-column:1/-1;color:var(--muted)";
+        msg.innerHTML='Sorry, this item could not be found. <a style="color:var(--brand)" href="services">Browse all services</a>.';
+        layout.appendChild(msg);
+      }
+      msg.style.display="";
       var rel0=document.querySelector(".detail-related"); if(rel0) rel0.style.display="none";
       return;
     }
+    var nf=document.getElementById("dNotFound"); if(nf) nf.style.display="none";
     document.title=item.title+" | Shahriar LLC";
     $("dTitle").textContent=item.title;
     $("dCrumb").textContent=item.title;
     $("dHeading").textContent=item.title;
-    $("dImg").src=imgSrc(item.img); $("dImg").alt=item.title;
+    var dimg=imgSrc(item.img);
+    if(dimg){ $("dImg").src=dimg; $("dImgWrap").style.display=""; } else { $("dImg").removeAttribute("src"); $("dImgWrap").style.display="none"; }
+    $("dImg").alt=item.title;
     $("dType").textContent=item.type;
     $("dOverview").textContent=clean((item.short?item.short+" ":"")+ (item.overview||""));
     $("dFeatures").innerHTML=(item.features||[]).map(function(f){return "<li>"+esc(clean(f))+"</li>"}).join("");
@@ -222,8 +239,10 @@
       if(relEl) relEl.style.display="";
       var rt=$("dRelatedTitle"); if(rt) rt.textContent=heading;
       $("dRelated").innerHTML=rel.map(function(r,i){
+        var rsrc=imgSrc(r.img);
+        var rimg=rsrc?'<img src="'+esc(rsrc)+'" alt="'+esc(r.title)+'" loading="lazy">':'';
         return '<article class="service-card reveal in" style="--d:'+(i*90)+'ms">'+
-          '<div class="sc-img"><img src="'+esc(imgSrc(r.img)) +'" alt="'+esc(r.title)+'" loading="lazy"></div>'+
+          '<div class="sc-img">'+rimg+'</div>'+
           '<div class="sc-body"><span class="sc-ic icon-'+(r.color||"blue")+'">'+
           '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span>'+
           '<h3>'+esc(r.title)+'</h3><p>'+esc(clean(r.short))+'</p>'+

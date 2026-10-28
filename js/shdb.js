@@ -101,10 +101,16 @@
         var last = "";
         var tick = function () {
           fetch(endpoint(PATH, true), { cache: "no-store" })
-            .then(function (r) { return r.ok ? r.text() : ""; })
+            .then(function (r) {
+              /* Only a 2xx is authoritative. A network/HTTP error must NOT
+                 be read as "empty" (that would blank the live site). */
+              if (!r.ok) return null;
+              return r.text();
+            })
             .then(function (t) {
-              /* "null" means the whole content node is empty/absent.
-                 Treat it as a real (empty) snapshot so the site clears. */
+              if (t === null) return;                 /* request failed: keep last */
+              /* "null" (or an empty body) means the content node is
+                 empty/absent — a real empty snapshot that clears the site. */
               var norm = (!t || t === "null") ? "null" : t;
               if (norm !== last) {
                 last = norm;

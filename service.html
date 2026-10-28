@@ -114,7 +114,6 @@
 <script src="js/config.js?v=20261028c"></script>
 <script src="js/shdb.js?v=20261028c"></script>
 <script src="js/stats.js?v=20261028c"></script>
-<script src="js/catalog.js?v=20261028c"></script>
 <script src="js/store.js?v=20261028c"></script>
 <script src="js/main.js?v=20261028c"></script>
 <script>
@@ -124,7 +123,7 @@
   var parent = new URLSearchParams(location.search).get("item") || "";
 
   function imgSrc(img) {
-    if (!img) return "assets/img/svc-web.jpg";
+    if (!img) return "";
     return /^(assets\/|data:|http|\.\.\/|\/)/.test(img) ? img : ("assets/" + img);
   }
 
@@ -158,8 +157,10 @@
     $("subList").innerHTML = subs.map(function (s, i) {
       var slug = s.id || "";
       var href = "detail?item=" + encodeURIComponent(parent) + "&sub=" + encodeURIComponent(slug);
+      var src = imgSrc(s.img);
+      var imgTag = src ? '<img src="' + esc(src) + '" alt="' + esc(s.title) + '" loading="lazy" />' : '';
       return '<article class="service-card reveal in" style="--d:' + ((i % 3) * 110) + 'ms">' +
-        '<div class="sc-img"><img src="' + esc(imgSrc(s.img)) + '" alt="' + esc(s.title) + '" loading="lazy" /></div>' +
+        '<div class="sc-img">' + imgTag + '</div>' +
         '<div class="sc-body">' +
         '<h3>' + esc(s.title) + '</h3>' +
         '<p>' + esc(s.tagline || s.overview || "") + '</p>' +

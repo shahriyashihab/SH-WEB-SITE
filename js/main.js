@@ -81,11 +81,15 @@
      not delivered yet the lists are simply empty. */
   function servicesData() {
     if (!window.SH) return [];
-    return SH.list("services").map(function (s) { return [s.title, s.icon, s.img, s.color, s.id, s.short]; });
+    var a = SH.list("services");
+    if (!Array.isArray(a)) return [];
+    return a.map(function (s) { return [s.title, s.icon, s.img, s.color, s.id, s.short]; });
   }
   function productsData() {
     if (!window.SH) return [];
-    return SH.list("products").map(function (p) { return { name: p.name, tag: p.tag, img: p.img, logo: p.logo, slug: p.id }; });
+    var a = SH.list("products");
+    if (!Array.isArray(a)) return [];
+    return a.map(function (p) { return { name: p.name, tag: p.tag, img: p.img, logo: p.logo, slug: p.id }; });
   }
 
   /* ---------- render a service card (image + floating icon) ---------- */
@@ -279,21 +283,31 @@
     setupReveal();
   }
 
+  /* The cloud poll fires every ~8s; re-rendering the whole page each time
+     is wasteful on slow links. Only re-render when a cheap content
+     signature actually changed. */
+  function dataSig() {
+    if (!window.SH) return "";
+    try { return JSON.stringify(SH.get()); } catch (e) { return String(Date.now()); }
+  }
+  var lastSig = null;
+  function renderIfChanged() {
+    var sig = dataSig();
+    if (sig === lastSig) return;
+    lastSig = sig;
+    try { renderAll(); } catch (e) {}
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
-    /* apply live content from the store (admin panel) if present */
-    renderAll();
+    renderIfChanged();
     setupHeader();
     setupForm();
   });
 
   /* re-render whenever live content changes (admin save, cloud, another tab) */
-  window.addEventListener("sh:change", function () {
-    try { renderAll(); } catch (e) {}
-  });
+  window.addEventListener("sh:change", renderIfChanged);
   /* first cloud snapshot arrived */
-  window.addEventListener("sh:ready", function () {
-    try { renderAll(); } catch (e) {}
-  });
+  window.addEventListener("sh:ready", renderIfChanged);
 
   /* ---------- live content binding ---------- */
   /* The HTML ships with neutral placeholder literals (a brand name,
@@ -454,7 +468,7 @@
   function renderHeroSlider(slides) {
     var host = document.getElementById("heroSlider");
     if (!host) return;
-    var list = (slides || []).filter(function (sl) { return sl && sl.img; });
+    var list = (Array.isArray(slides) ? slides : []).filter(function (sl) { return sl && sl.img; });
 
     /* Cloud is the only source for hero images: when the cloud has no
        slides, clear the hero (no hard-coded demo picture). */

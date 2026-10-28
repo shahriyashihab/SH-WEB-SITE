@@ -336,8 +336,15 @@
   }
 
   function openSubServiceModal(id) {
-    var s = id ? SH.getItem("subservices", id) : { parent: (parentServices()[0] || {}).id || "", title: "", icon: "code", color: "blue", img: "", tagline: "", overview: "", features: [], includes: [], price: "Contact for pricing", delivery: "" };
     var parents = parentServices();
+    /* A sub-service must belong to a main service. With none defined yet
+       there is nothing to attach to, so guide the admin instead of
+       allowing an orphaned record with an empty parent. */
+    if (!parents.length) {
+      toast("Add a main Service first, then create its sub-services");
+      return;
+    }
+    var s = id ? SH.getItem("subservices", id) : { parent: (parents[0] || {}).id || "", title: "", icon: "code", color: "blue", img: "", tagline: "", overview: "", features: [], includes: [], price: "Contact for pricing", delivery: "" };
     var html =
       '<div class="fld"><label>Belongs to (Main Service)</label><select id="sParent">' +
         parents.map(function (p) { return '<option value="' + esc(p.id) + '"' + (s.parent === p.id ? " selected" : "") + '>' + esc(p.title) + '</option>'; }).join("") +
@@ -532,7 +539,7 @@
   function renderAdminsList() {
     var list = SH.list("admins");
     $("adminsList").innerHTML = list.map(function (a) {
-      return '<div class="row-item"><div class="thumb-fallback">' + esc(a.username.charAt(0).toUpperCase()) + '</div>' +
+      return '<div class="row-item"><div class="thumb-fallback">' + esc(String(a.username || "?").charAt(0).toUpperCase()) + '</div>' +
         '<div class="info"><b>' + esc(a.username) + '</b><span>' + esc(a.role || "Admin") + '</span></div>' +
         '<div class="row-actions"><button class="btn btn-outline btn-sm" data-edit-admin="' + a.id + '">Edit</button>' +
         (list.length > 1 ? '<button class="btn btn-danger btn-sm" data-del-admin="' + a.id + '">Delete</button>' : '') + '</div></div>';
