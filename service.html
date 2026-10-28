@@ -1,23 +1,23 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Service | Shahriar LLC</title>
-<meta name="description" content="Explore the detailed solutions under this service — Shahriar LLC." />
+<meta name="description" content="Explore the detailed solutions under this service â€” Shahriar LLC." />
 <link rel="canonical" href="https://sprint.fast-page.org/service" />
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Shahriar LLC" />
 <meta property="og:title" content="Service | Shahriar LLC" />
-<meta property="og:description" content="Explore the detailed solutions under this service — Shahriar LLC." />
+<meta property="og:description" content="Explore the detailed solutions under this service â€” Shahriar LLC." />
 <meta property="og:url" content="https://sprint.fast-page.org/service" />
 <meta property="og:image" content="https://sprint.fast-page.org/assets/img/og-cover.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Service | Shahriar LLC" />
-<meta name="twitter:description" content="Explore the detailed solutions under this service — Shahriar LLC." />
+<meta name="twitter:description" content="Explore the detailed solutions under this service â€” Shahriar LLC." />
 <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
-<link rel="stylesheet" href="css/style.css?v=20261029b" />
+<link rel="stylesheet" href="css/style.css?v=20261028c" />
 </head>
 <body>
 
@@ -111,12 +111,12 @@
   <div class="container footer-bottom"><span>&copy; 2026 Shahriar LLC. All rights reserved.</span><span>Best Software Company in Bangladesh</span></div>
 </footer>
 
-<script src="js/config.js?v=20261029b"></script>
-<script src="js/shdb.js?v=20261029b"></script>
-<script src="js/stats.js?v=20261029b"></script>
-<script src="js/catalog.js?v=20261029b"></script>
-<script src="js/store.js?v=20261029b"></script>
-<script src="js/main.js?v=20261029b"></script>
+<script src="js/config.js?v=20261028c"></script>
+<script src="js/shdb.js?v=20261028c"></script>
+<script src="js/stats.js?v=20261028c"></script>
+<script src="js/catalog.js?v=20261028c"></script>
+<script src="js/store.js?v=20261028c"></script>
+<script src="js/main.js?v=20261028c"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -136,11 +136,12 @@
   }
 
   function render() {
-    var cat = (window.CATALOG || {})[parent] || {};
-    var title = cat.title || parent || "Service";
+    /* title comes only from the cloud store */
+    var title = parent || "Service";
     if (window.SH) {
       var svc = SH.getItem("services", parent);
       if (svc && svc.title) title = svc.title;
+      else if (!parent) title = "Service";
     }
     document.title = title + " | Shahriar LLC";
     $("svcTitle").textContent = title;
@@ -170,8 +171,9 @@
 
   render();
   window.addEventListener("sh:change", render);
+  window.addEventListener("sh:ready", render);
 })();
 </script>
-<script src="js/seo.js?v=20261029b"></script>
+<script src="js/seo.js?v=20261028c"></script>
 </body>
 </html>

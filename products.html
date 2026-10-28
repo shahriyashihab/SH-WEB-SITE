@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -17,7 +17,7 @@
 <meta name="twitter:title" content="Our Products | Shahriar LLC" />
 <meta name="twitter:description" content="Buy ready-made software products by Shahriar LLC: Sheba ERP, HR & payroll, Salesman, Binyog, Filling Master, Smart Educare, Gym Master, CRM, Asset Management and more." />
 <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
-<link rel="stylesheet" href="css/style.css?v=20261029b" />
+<link rel="stylesheet" href="css/style.css?v=20261028c" />
 </head>
 <body>
 
@@ -117,45 +117,46 @@
   <div class="container footer-bottom"><span>&copy; 2026 Shahriar LLC. All rights reserved.</span><span>Best Software Company in Bangladesh</span></div>
 </footer>
 
-<script src="js/config.js?v=20261029b"></script>
-<script src="js/shdb.js?v=20261029b"></script>
-<script src="js/stats.js?v=20261029b"></script>
-<script src="js/store.js?v=20261029b"></script>
-<script src="js/main.js?v=20261029b"></script>
+<script src="js/config.js?v=20261028c"></script>
+<script src="js/shdb.js?v=20261028c"></script>
+<script src="js/stats.js?v=20261028c"></script>
+<script src="js/store.js?v=20261028c"></script>
+<script src="js/main.js?v=20261028c"></script>
 <script>
-document.addEventListener("DOMContentLoaded",function(){
-  var P=[
-    {name:"Sheba ERP", tag:"Best ERP Software in Bangladesh", img:"assets/img/prod-erp.jpg", logo:"ERP", slug:"sheba-erp"},
-    {name:"HR Sheba", tag:"Best HR & Payroll Software in Bangladesh", img:"assets/img/prod-hr.jpg", logo:"HR", slug:"hr-sheba"},
-    {name:"Salesman", tag:"Best Sales & Distribution Software", img:"assets/img/prod-sales.jpg", logo:"SD", slug:"salesman"},
-    {name:"Binyog", tag:"Best Accounting Software in Bangladesh", img:"assets/img/prod-account.jpg", logo:"ACC", slug:"binyog"},
-    {name:"Smart Educare", tag:"Best School Management System", img:"assets/img/prod-school.jpg", logo:"EDU", slug:"smart-educare"},
-    {name:"Gym Master", tag:"Best Gym Management Software", img:"assets/img/prod-gym.jpg", logo:"GYM", slug:"gym-master"},
-    {name:"CRM Suite", tag:"Best CRM Software in Bangladesh", img:"assets/img/prod-crm.jpg", logo:"CRM", slug:"crm-suite"},
-    {name:"Asset Management", tag:"Best Asset Management System", img:"assets/img/prod-asset.jpg", logo:"AMS", slug:"asset-management"},
-    {name:"Remit Sheba", tag:"Best Remittance Management System", img:"assets/img/prod-remit.jpg", logo:"RMS", slug:"remit-sheba"},
-    {name:"Zentix AI", tag:"AI Graphic Design & Auto-Publishing", img:"assets/img/prod-zentix.jpg", logo:"AI", slug:"zentix-ai"},
-    {name:"Filling Master", tag:"Best Document Filling Software", img:"assets/img/prod-account.jpg", logo:"FM", slug:"filling-master"},
-    {name:"POS Pro", tag:"Best POS & Retail Software", img:"assets/img/prod-erp.jpg", logo:"POS", slug:"pos-pro"}
-  ];
-  var g=document.getElementById("productGrid");
-  if(g) g.innerHTML=P.map(function(p,i){
-    return '<article class="product-card reveal" style="--d:'+(i%3*110)+'ms">'
-      +'<a href="detail?item='+p.slug+'" style="display:contents">'
-      +'<div class="pc-logo">'+p.logo+'</div>'
-      +'<h3 class="pc-tag">'+p.name+'</h3>'
-      +'<p class="pc-sub">'+p.tag+'</p>'
-      +'<div class="pc-frame"><img src="'+p.img+'" alt="'+p.name+'" loading="lazy"></div>'
-      +'</a>'
-      +'<div class="pc-actions">'
-      +'<a href="tel:+8801958633202" class="btn-product btn-call">&#128222; Call Now</a>'
-      +'<a href="detail?item='+p.slug+'" class="btn-product btn-demo">&#128433; View Details</a>'
-      +'</div></article>';
-  }).join("");
-  
-  document.querySelectorAll(".reveal").forEach(function(el){el.classList.add("in")});
-});
+(function () {
+  /* Products are rendered ONLY from the cloud store. No hard-coded list,
+     so deleting a product in the admin panel removes it from this page. */
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+  function imgSrc(img) { if (!img) return ""; return /^(assets\/|data:|http|\.\.\/|\/)/.test(img) ? img : ("assets/" + img); }
+  function dial() { try { var s = SH.get().site || {}; return String(s.phone || "").replace(/[^\d+]/g, ""); } catch (e) { return ""; } }
+
+  function render() {
+    var g = $("productGrid");
+    if (!g) return;
+    var P = (window.SH && SH.list("products")) || [];
+    g.innerHTML = P.map(function (p, i) {
+      var src = imgSrc(p.img);
+      var imgTag = src ? '<img src="' + esc(src) + '" alt="' + esc(p.name) + '" loading="lazy">' : "";
+      return '<article class="product-card reveal in" style="--d:' + (i % 3 * 110) + 'ms">'
+        + '<a href="detail?item=' + esc(p.id) + '" style="display:contents">'
+        + '<div class="pc-logo">' + esc(p.logo) + '</div>'
+        + '<h3 class="pc-tag">' + esc(p.name) + '</h3>'
+        + '<p class="pc-sub">' + esc(p.tag || "") + '</p>'
+        + '<div class="pc-frame">' + imgTag + '</div>'
+        + '</a>'
+        + '<div class="pc-actions">'
+        + '<a href="tel:' + dial() + '" class="btn-product btn-call">&#128222; Call Now</a>'
+        + '<a href="detail?item=' + esc(p.id) + '" class="btn-product btn-demo">&#128433; View Details</a>'
+        + '</div></article>';
+    }).join("");
+  }
+
+  render();
+  window.addEventListener("sh:change", render);
+  window.addEventListener("sh:ready", render);
+})();
 </script>
-<script src="js/seo.js?v=20261029b"></script>
+<script src="js/seo.js?v=20261028c"></script>
 </body>
 </html>

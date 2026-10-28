@@ -1,23 +1,23 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Team Member Profile | Shahriar LLC</title>
-<meta name="description" content="Meet the leadership and management team behind Shahriar LLC — an offshore software company in Bangladesh delivering ERP, CRM, web and mobile solutions since 2007." />
+<meta name="description" content="Meet the leadership and management team behind Shahriar LLC â€” an offshore software company in Bangladesh delivering ERP, CRM, web and mobile solutions since 2007." />
 <link rel="canonical" href="https://sprint.fast-page.org/profile" />
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Shahriar LLC" />
 <meta property="og:title" content="Team Member Profile | Shahriar LLC" />
-<meta property="og:description" content="Meet the leadership and management team behind Shahriar LLC — an offshore software company in Bangladesh delivering ERP, CRM, web and mobile solutions since 2007." />
+<meta property="og:description" content="Meet the leadership and management team behind Shahriar LLC â€” an offshore software company in Bangladesh delivering ERP, CRM, web and mobile solutions since 2007." />
 <meta property="og:url" content="https://sprint.fast-page.org/profile" />
 <meta property="og:image" content="https://sprint.fast-page.org/assets/img/og-cover.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Team Member Profile | Shahriar LLC" />
-<meta name="twitter:description" content="Meet the leadership and management team behind Shahriar LLC — an offshore software company in Bangladesh delivering ERP, CRM, web and mobile solutions since 2007." />
+<meta name="twitter:description" content="Meet the leadership and management team behind Shahriar LLC â€” an offshore software company in Bangladesh delivering ERP, CRM, web and mobile solutions since 2007." />
 <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
-<link rel="stylesheet" href="css/style.css?v=20261029b" />
+<link rel="stylesheet" href="css/style.css?v=20261028c" />
 </head>
 <body>
 
@@ -108,57 +108,41 @@
   <div class="container footer-bottom"><span>&copy; 2026 Shahriar LLC. All rights reserved.</span><span>Best Software Company in Bangladesh</span></div>
 </footer>
 
-<script src="js/config.js?v=20261029b"></script>
-<script src="js/shdb.js?v=20261029b"></script>
-<script src="js/stats.js?v=20261029b"></script>
-<script src="js/store.js?v=20261029b"></script>
-<script src="js/main.js?v=20261029b"></script>
+<script src="js/config.js?v=20261028c"></script>
+<script src="js/shdb.js?v=20261028c"></script>
+<script src="js/stats.js?v=20261028c"></script>
+<script src="js/store.js?v=20261028c"></script>
+<script src="js/main.js?v=20261028c"></script>
 <script>
 (function(){
+  /* Team profile is rendered ONLY from the cloud store. If the member
+     was deleted in the admin panel it no longer exists here. */
   var $=function(id){return document.getElementById(id)};
-  var TEAM=[
-    {slug:"md-mofakhkharul-islam", n:"Md. Mofakhkharul Islam", r:"CEO & Managing Director", img:"assets/img/team-1.jpg",
-      bio:"Engr. Md. Mofakhkharul Islam is a seasoned software engineer and project management expert who has led Shahriar LLC since its founding in 2007. Under his leadership the company has grown into a diversified offshore IT services provider.",
-      focus:["Company strategy","Project management","Technology leadership","Client relationships"]},
-    {slug:"md-mohiuddin-ahmed", n:"Md. Mohiuddin Ahmed", r:"Director (Finance)", img:"assets/img/team-2.jpg",
-      bio:"Md. Mohiuddin Ahmed has led Shahriar LLC's finance function since the beginning. He oversees all financial policy, budgeting and compliance, ensuring the company remains stable and transparent.",
-      focus:["Financial planning","Budgeting","Compliance","Risk management"]},
-    {slug:"md-tariqul-azam", n:"Md Tariqul Azam", r:"Managing Partner (Business Development)", img:"assets/img/team-3.jpg",
-      bio:"Md Tariqul Azam, known as Capt. Tarique Lincoln, is a trailblazing Bangladeshi leader who drives business development and partnerships for Shahriar LLC.",
-      focus:["Business development","Partnerships","Market expansion","Client growth"]},
-    {slug:"john-henao", n:"John Henao", r:"Inter. Market Managing Partner", img:"assets/img/team-4.jpg",
-      bio:"John Henao brings over 15 years of experience in internet marketing, software engineering and web research, leading our international market efforts.",
-      focus:["International marketing","Market research","Growth strategy","Brand development"]},
-    {slug:"head-of-engineering", n:"Head of Engineering", r:"Software Architecture", img:"assets/img/team-5.jpg",
-      bio:"Our Head of Engineering leads the technical architecture of every project, ensuring scalable, secure and maintainable systems.",
-      focus:["System architecture","Code quality","Security","Technical mentoring"]},
-    {slug:"manager-client-success", n:"Manager, Client Success", r:"Customer Support", img:"assets/img/team-6.jpg",
-      bio:"Our Client Success Manager ensures every customer receives prompt, friendly and effective support throughout their project lifecycle.",
-      focus:["Client onboarding","Support","Project delivery","Customer satisfaction"]}
-  ];
   var slug=new URLSearchParams(location.search).get("m");
+  function imgSrc(img){ if(!img) return ""; return /^(assets\/|data:|http|\.\.\/|\/)/.test(img)?img:("assets/"+img); }
   function render(){
-    var m=null;
-    /* Prefer live store data (admin). Store members use name/role/bio/img/focus. */
-    if(window.SH && SH.list("team").length){ m=SH.getItem("team",slug); }
-    if(m){
-      m={ n:m.name, r:m.role, img:m.img, bio:m.bio, focus:m.focus };
+    var m = (window.SH && slug) ? SH.getItem("team", slug) : null;
+    if(!m){
+      $("mName").textContent="Not found"; $("mCrumb").textContent="Not found";
+      $("mTitle").textContent="Not found"; $("mRole").textContent="";
+      $("mImg").removeAttribute("src"); $("mImg").alt="";
+      $("mHeading").textContent=""; $("mBio").textContent="This team member could not be found.";
+      $("mFocus").innerHTML="";
+      return;
     }
-    if(!m){ for(var i=0;i<TEAM.length;i++){ if(TEAM[i].slug===slug){ m=TEAM[i]; break; } } }
-    if(!m) m=TEAM[0];
-    var img=(/^(assets\/|data:|http)/.test(m.img||"")?m.img:("assets/"+m.img));
-    document.title=m.n+" | Shahriar LLC";
-    $("mName").textContent=m.n; $("mCrumb").textContent=m.n;
-    $("mTitle").textContent=m.n; $("mRole").textContent=m.r;
-    $("mImg").src=img; $("mImg").alt=m.n;
-    $("mHeading").textContent="About "+m.n;
-    $("mBio").textContent=m.bio;
+    document.title=m.name+" | Shahriar LLC";
+    $("mName").textContent=m.name; $("mCrumb").textContent=m.name;
+    $("mTitle").textContent=m.name; $("mRole").textContent=m.role||"";
+    var img=imgSrc(m.img); if(img){ $("mImg").src=img; } $("mImg").alt=m.name||"";
+    $("mHeading").textContent="About "+m.name;
+    $("mBio").textContent=m.bio||"";
     $("mFocus").innerHTML=(m.focus||[]).map(function(f){return "<li>"+f+"</li>"}).join("");
   }
   render();
   window.addEventListener("sh:change", render);
+  window.addEventListener("sh:ready", render);
 })();
 </script>
-<script src="js/seo.js?v=20261029b"></script>
+<script src="js/seo.js?v=20261028c"></script>
 </body>
 </html>

@@ -34,9 +34,13 @@
   try { bc = ("BroadcastChannel" in window) ? new BroadcastChannel(CH) : null; } catch (e) { bc = null; }
   var localSubs = [];
 
-  function endpoint(path) {
-    /* Firebase REST wants a key in the query string. */
-    return URL + "/" + path.replace(/^\//, "") + ".json?auth=" + encodeURIComponent(KEY);
+  function endpoint(path, bust) {
+    /* Firebase REST wants a key in the query string. A `_` timestamp is
+       added on reads so no proxy/browser cache ever serves stale data —
+       a plain reload always fetches the newest content. */
+    var u = URL + "/" + path.replace(/^\//, "") + ".json?auth=" + encodeURIComponent(KEY);
+    if (bust) u += "&_=" + Date.now();
+    return u;
   }
 
   function uid() {
@@ -69,7 +73,7 @@
     /* one-time read from the cloud */
     pull: function (cb) {
       if (!CLOUD) { cb(null); return; }
-      fetch(endpoint(PATH), { cache: "no-store" })
+      fetch(endpoint(PATH, true), { cache: "no-store" })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) { cb(d || null); })
         .catch(function () { cb(null); });
@@ -96,10 +100,17 @@
       if (CLOUD) {
         var last = "";
         var tick = function () {
-          fetch(endpoint(PATH), { cache: "no-store" })
+          fetch(endpoint(PATH, true), { cache: "no-store" })
             .then(function (r) { return r.ok ? r.text() : ""; })
             .then(function (t) {
-              if (t && t !== last) { last = t; try { cb({ local: false, data: JSON.parse(t) }); } catch (e) {} }
+              /* "null" means the whole content node is empty/absent.
+                 Treat it as a real (empty) snapshot so the site clears. */
+              var norm = (!t || t === "null") ? "null" : t;
+              if (norm !== last) {
+                last = norm;
+                if (norm === "null") { cb({ local: false, data: { __empty: true } }); return; }
+                try { cb({ local: false, data: JSON.parse(norm) }); } catch (e) {}
+              }
             })
             .catch(function () {});
         };

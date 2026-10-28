@@ -9,7 +9,7 @@ const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "seo");
 const SITE = "https://sprint.fast-page.org";
 /* bump this whenever you want every browser to refetch JS/CSS */
-const VERSION = process.env.SH_VERSION || "20261028a";
+const VERSION = process.env.SH_VERSION || "20261028c";
 
 // load catalog
 global.window = {};

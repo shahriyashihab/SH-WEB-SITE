@@ -21,14 +21,9 @@
   };
   function icon(n) { return ICONS[n] || ICONS.code; }
 
-  var PRODUCTS = [
-    { name: "Sheba ERP", tag: "Best ERP Software in Bangladesh", img: "assets/img/prod-erp.jpg", logo: "ERP", slug: "sheba-erp" },
-    { name: "HR Sheba", tag: "Best HR & Payroll Software", img: "assets/img/prod-hr.jpg", logo: "HR", slug: "hr-sheba" },
-    { name: "Smart Educare", tag: "Best School Management System", img: "assets/img/prod-school.jpg", logo: "EDU", slug: "smart-educare" },
-    { name: "Gym Master", tag: "Best Gym Management Software", img: "assets/img/prod-gym.jpg", logo: "GYM", slug: "gym-master" },
-    { name: "CRM Suite", tag: "Best CRM Software in Bangladesh", img: "assets/img/prod-crm.jpg", logo: "CRM", slug: "crm-suite" },
-    { name: "Remit Sheba", tag: "Best Remittance Management System", img: "assets/img/prod-remit.jpg", logo: "RMS", slug: "remit-sheba" }
-  ];
+  /* No demo data lives in the app. All content (services, products,
+     team, portfolio, slides, hero, ceo, site) is loaded from the cloud
+     through window.SH and rendered at runtime. */
 
   /* ---------- tech marquee builder (two rows, opposite directions) ---------- */
   function chipHTML(t) {
@@ -52,25 +47,11 @@
     };
     return '<div class="logo-marquee">' + makeRow(rowA, "ltr") + makeRow(rowB, "rtl") + '</div>';
   }
-  /* [title, icon, image, color, slug] */
-  var SERVICE_LIST = [
-    ["Website Design & Development", "code", "assets/img/svc-web.jpg", "blue", "website-design-development"],
-    ["Custom Software Development", "code", "assets/img/svc-software.jpg", "cyan", "custom-software-development"],
-    ["Mobile Apps Development", "phone", "assets/img/svc-mobile.jpg", "orange", "mobile-apps-development"],
-    ["ERP & CRM Solutions", "erp", "assets/img/svc-erp.jpg", "purple", "erp-crm-solutions"],
-    ["Digital Marketing", "cloud", "assets/img/svc-marketing.jpg", "green", "digital-marketing"],
-    ["IT Support & Consultancy", "shield", "assets/img/svc-support.jpg", "blue", "it-support-consultancy"],
-    ["E-commerce Solution", "cart", "assets/img/svc-web.jpg", "cyan", "ecommerce-solution"],
-    ["HR & Payroll Management", "users", "assets/img/svc-erp.jpg", "orange", "hr-payroll-management"],
-    ["POS & Retail Software", "pos", "assets/img/svc-software.jpg", "purple", "pos-retail-software"],
-    ["School Management System", "school", "assets/img/svc-support.jpg", "green", "school-management-system"],
-    ["Business Process Outsourcing", "cloud", "assets/img/svc-marketing.jpg", "blue", "business-process-outsourcing"],
-    ["Cyber Security", "shield", "assets/img/svc-software.jpg", "cyan", "cyber-security"]
-  ];
+  /* Industries are presentation-only sections (not business content),
+     so they stay as fixed UI labels. Everything else is cloud-driven. */
   var INDUSTRIES = ["Government Sector", "Private Sector", "Education Sector", "Offshore Client", "RMG Sector", "Healthcare", "Banking & Finance", "Retail & Super Shop", "Real Estate", "NGO & Development", "ISP & Telecom", "Hospitality & Travel"];
-  var TECH = ["PHP / Laravel", "CodeIgniter", "Node.js", "React", "Vue.js", "Next.js", "Flutter", "Android (Kotlin)", "iOS (Swift)", "Python / Django", "ASP.NET", "MySQL", "PostgreSQL", "MongoDB", "AWS", "Docker"];
 
-  /* tech logos (local SVG files) for the scrolling marquee */
+  /* tech logos (local SVG files) for the scrolling marquee — UI only */
   var TECH_LOGOS = [
     ["PHP", "php.svg"], ["Laravel", "laravel.svg"], ["CodeIgniter", "codeigniter.svg"],
     ["Node.js", "nodejs.svg"], ["JavaScript", "javascript.svg"], ["React", "react.svg"],
@@ -79,19 +60,6 @@
     ["iOS", "ios.svg"], [".NET", "dotnet.svg"], ["MySQL", "mysql.svg"],
     ["PostgreSQL", "postgresql.svg"], ["MongoDB", "mongodb.svg"], ["WordPress", "wordpress.svg"],
     ["Docker", "docker.svg"], ["AWS", ""]
-  ];
-  var TESTIMONIALS = [
-    { q: "Shahriar LLC delivered our ERP ahead of schedule and the support has been outstanding ever since.", n: "Managing Director", r: "Manufacturing Group" },
-    { q: "Their school management system transformed how we run admissions, results and billing.", n: "Principal", r: "Education Institute" },
-    { q: "A dependable offshore partner. Clear communication and truly senior engineering.", n: "CTO", r: "Offshore Client" }
-  ];
-  var PORTFOLIO = [
-    { cat: "ERP", t: "Enterprise Resource Planning", d: "Full ERP with inventory, accounts, HR and reporting for a manufacturing group." },
-    { cat: "Education", t: "School Management System", d: "Admissions, attendance, results, fees and parent portal for 10,000+ students." },
-    { cat: "Retail", t: "Super Shop Management", d: "POS, stock, supplier and loyalty system across multiple outlets." },
-    { cat: "HR", t: "HR & Payroll Platform", d: "Payroll, leave, attendance and HR workflow for enterprise clients." },
-    { cat: "E-commerce", t: "E-commerce Solution", d: "Multi-vendor store with payments, delivery and dashboard." },
-    { cat: "Government", t: "E-Governance Solution", d: "Citizen services portal with secure workflow and reporting." }
   ];
 
   /* ---------- helpers ---------- */
@@ -109,17 +77,15 @@
     return "info@sprint.fast-page.org";
   }
 
+  /* Cloud-only data getters. No local demo fallback: if the cloud has
+     not delivered yet the lists are simply empty. */
   function servicesData() {
-    if (window.SH && SH.list("services").length) {
-      return SH.list("services").map(function (s) { return [s.title, s.icon, s.img, s.color, s.id, s.short]; });
-    }
-    return SERVICE_LIST;
+    if (!window.SH) return [];
+    return SH.list("services").map(function (s) { return [s.title, s.icon, s.img, s.color, s.id, s.short]; });
   }
   function productsData() {
-    if (window.SH && SH.list("products").length) {
-      return SH.list("products").map(function (p) { return { name: p.name, tag: p.tag, img: p.img, logo: p.logo, slug: p.id }; });
-    }
-    return PRODUCTS;
+    if (!window.SH) return [];
+    return SH.list("products").map(function (p) { return { name: p.name, tag: p.tag, img: p.img, logo: p.logo, slug: p.id }; });
   }
 
   /* ---------- render a service card (image + floating icon) ---------- */
@@ -127,14 +93,15 @@
     var delay = (i % 3) * 110;
     var slug = s[4] || "";
     var link = slug ? "service?item=" + encodeURIComponent(slug) : "services";
-    var img = s[2] || "assets/img/svc-web.jpg";
+    var img = s[2] || "";
     var src = /^(assets\/|data:|http)/.test(img) ? img : ("assets/" + img);
+    var imgTag = src ? '<img src="' + esc(src) + '" alt="' + esc(s[0]) + '" loading="lazy" />' : '';
     return '<article class="service-card reveal" style="--d:' + delay + 'ms">' +
-      '<div class="sc-img"><img src="' + esc(src) + '" alt="' + esc(s[0]) + '" loading="lazy" /></div>' +
+      '<div class="sc-img">' + imgTag + '</div>' +
       '<div class="sc-body">' +
       '<span class="sc-ic icon-' + (s[3] || "blue") + '">' + icon(s[1]) + '</span>' +
       '<h3>' + esc(s[0]) + '</h3>' +
-      '<p>' + esc(s[5] || ("Robust, scalable and efficient " + String(s[0]).toLowerCase() + " delivered by our senior team.")) + '</p>' +
+      '<p>' + esc(s[5] || "") + '</p>' +
       '<a class="btn-service" href="' + link + '">View Details</a>' +
       '</div></article>';
   }
@@ -168,19 +135,28 @@
     if ($("homeTech")) {
       $("homeTech").innerHTML = buildMarquee();
     }
+    /* testimonials are cloud content: hide the section entirely when the
+       cloud has none, so no demo text is ever shown */
     if ($("homeTestimonials")) {
-      $("homeTestimonials").innerHTML = TESTIMONIALS.map(function (t, i) {
-        return '<blockquote class="quote reveal" style="--d:' + (i * 120) + 'ms"><p>&ldquo;' + esc(t.q) + '&rdquo;</p>' +
-          '<div class="who">' + esc(t.n) + '<span>' + esc(t.r) + '</span></div></blockquote>';
-      }).join("");
+      var tst = (window.SH && SH.list("testimonials")) || [];
+      var tsec = $("homeTestimonials").closest("section");
+      if (!tst.length) {
+        $("homeTestimonials").innerHTML = "";
+        if (tsec) tsec.style.display = "none";
+      } else {
+        if (tsec) tsec.style.display = "";
+        $("homeTestimonials").innerHTML = tst.map(function (t, i) {
+          return '<blockquote class="quote reveal" style="--d:' + (i * 120) + 'ms"><p>&ldquo;' + esc(t.q) + '&rdquo;</p>' +
+            '<div class="who">' + esc(t.n) + '<span>' + esc(t.r) + '</span></div></blockquote>';
+        }).join("");
+      }
     }
   }
 
   function renderServicesPage() { if ($("allServices")) $("allServices").innerHTML = servicesData().map(svcCard).join(""); }
   function renderPortfolioPage() {
     if ($("pfGrid")) {
-      var items = (window.SH && SH.list("portfolio").length) ? SH.list("portfolio")
-        : [{ cat: "ERP", t: "Enterprise Resource Planning", d: "Full ERP with inventory, accounts, HR and reporting for a manufacturing group." }];
+      var items = (window.SH && SH.list("portfolio")) || [];
       $("pfGrid").innerHTML = items.map(function (p, i) {
         return '<article class="pf-card reveal" style="--d:' + ((i % 3) * 110) + 'ms"><div class="pf-thumb">' + esc(p.cat) + '</div>' +
           '<div class="pf-body"><span class="cat">' + esc(p.cat) + '</span>' +
@@ -314,21 +290,25 @@
   window.addEventListener("sh:change", function () {
     try { renderAll(); } catch (e) {}
   });
+  /* first cloud snapshot arrived */
+  window.addEventListener("sh:ready", function () {
+    try { renderAll(); } catch (e) {}
+  });
 
   /* ---------- live content binding ---------- */
-  /* Built-in seed values that appear hard-coded in the HTML.
-     They are the initial "from" side of every search-and-replace so
-     admin edits propagate to every page (topbar, footer, contact
-     blocks). CURRENT remembers the last value we wrote so a second
-     admin edit replaces the previous value, not just the seed. */
-  var SEED = {
+  /* The HTML ships with neutral placeholder literals (a brand name,
+     a phone, an email, an address). These are NOT demo content: they
+     are only the "from" side of a search-and-replace so the live cloud
+     values can be dropped into every page. CURRENT remembers the last
+     value we wrote so a second cloud change replaces the previous one. */
+  var HTML_DEFAULTS = {
     phone: "+880 1958-633202",
     email: "info@sprint.fast-page.org",
     address: "Dhaka, Bangladesh",
     company: "Shahriar LLC",
     subCompany: "BD LTD"
   };
-  var CURRENT = { phone: SEED.phone, email: SEED.email, address: SEED.address, company: SEED.company };
+  var CURRENT = { phone: HTML_DEFAULTS.phone, email: HTML_DEFAULTS.email, address: HTML_DEFAULTS.address, company: HTML_DEFAULTS.company };
 
   /* Replace a literal text value inside text nodes only (keeps markup). */
   function replaceText(oldVal, newVal) {
@@ -342,12 +322,12 @@
     }
   }
 
-  /* Swap an old live value for a new one, trying both the seed text and
-     whatever value is currently displayed. Returns nothing. */
+  /* Swap an old live value for a new one, trying both the HTML default
+     text and whatever value is currently displayed. */
   function swapField(key, newVal) {
     if (!newVal) return;
     var from = [];
-    if (SEED[key] && SEED[key] !== newVal) from.push(SEED[key]);
+    if (HTML_DEFAULTS[key] && HTML_DEFAULTS[key] !== newVal) from.push(HTML_DEFAULTS[key]);
     if (CURRENT[key] && CURRENT[key] !== newVal && from.indexOf(CURRENT[key]) === -1) from.push(CURRENT[key]);
     from.forEach(function (oldVal) { replaceText(oldVal, newVal); });
     CURRENT[key] = newVal;
@@ -415,9 +395,15 @@
     return /^(assets\/|data:|http|\.\.\/|\/)/.test(img) ? img : ("assets/" + img);
   }
 
-  /* Fill CEO name / role / photo / message wherever hooks exist. */
+  /* Fill CEO name / role / photo / message wherever hooks exist.
+     Cloud only: with no CEO data the block is hidden. */
   function bindCeo(c) {
-    if (!c) return;
+    var block = document.querySelector(".ceo-block");
+    if (!c || (!c.name && !c.role && !(c.message && c.message.length) && !c.img)) {
+      if (block) block.style.display = "none";
+      return;
+    }
+    if (block) block.style.display = "";
     var name = c.name || "";
     var role = c.role || "";
     var msg = c.message || [];
@@ -441,30 +427,23 @@
     });
   }
 
-  /* Build a team card grid for both about.html and team.html. */
-  var TEAM_FALLBACK = [
-    { id: "md-mofakhkharul-islam", name: "Md. Mofakhkharul Islam", role: "CEO & Managing Director", img: "assets/img/team-1.jpg" },
-    { id: "md-mohiuddin-ahmed", name: "Md. Mohiuddin Ahmed", role: "Director (Finance)", img: "assets/img/team-2.jpg" },
-    { id: "md-tariqul-azam", name: "Md Tariqul Azam", role: "Managing Partner (Business Development)", img: "assets/img/team-3.jpg" },
-    { id: "john-henao", name: "John Henao", role: "Inter. Market Managing Partner", img: "assets/img/team-4.jpg" },
-    { id: "head-of-engineering", name: "Head of Engineering", role: "Software Architecture", img: "assets/img/team-5.jpg" },
-    { id: "manager-client-success", name: "Manager, Client Success", role: "Customer Support", img: "assets/img/team-6.jpg" }
-  ];
-  function teamData() {
-    if (window.SH && SH.list("team").length) return SH.list("team");
-    return TEAM_FALLBACK;
-  }
+  /* Build a team card grid for both about.html and team.html.
+     Cloud only — no local team fallback. If the cloud has none the grid
+     is empty, and the whole team section is hidden. */
   function slugOf(m) {
     return m.id || String(m.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   }
   function renderTeamGrids(team) {
-    var list = (team && team.length) ? team : teamData();
+    var list = (team && team.length) ? team : ((window.SH && SH.list("team")) || []);
     var html = list.map(function (m, i) {
       return '<a class="member reveal in" href="profile?m=' + esc(slugOf(m)) + '" style="--d:' + ((i % 4) * 90) + 'ms;text-decoration:none">' +
         '<div class="member-photo"><img src="' + esc(imgSrc(m.img)) + '" alt="' + esc(m.name || "") + '" loading="lazy"></div>' +
         '<div class="mb"><h3>' + esc(m.name || "") + '</h3><span>' + esc(m.role || "") + '</span></div></a>';
     }).join("");
     document.querySelectorAll("#teamGrid, #homeTeam").forEach(function (g) { g.innerHTML = html; });
+    /* hide the team section when there is no cloud team */
+    var grid = document.getElementById("teamGrid");
+    if (grid) { var sec = grid.closest("section"); if (sec) sec.style.display = list.length ? "" : "none"; }
   }
 
   /* ---- hero slider: slides the picture in the hero card ----
@@ -477,8 +456,16 @@
     if (!host) return;
     var list = (slides || []).filter(function (sl) { return sl && sl.img; });
 
-    /* Nothing configured yet: keep whatever static image is in the markup. */
-    if (!list.length) return;
+    /* Cloud is the only source for hero images: when the cloud has no
+       slides, clear the hero (no hard-coded demo picture). */
+    if (!list.length) {
+      if (heroSig !== "__empty__") {
+        heroSig = "__empty__";
+        if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
+        host.innerHTML = "";
+      }
+      return;
+    }
 
     /* Re-rendering on every sh:change (cloud poll fires every ~8s) would
        reload the images and restart the timer, which looks like a stall/
@@ -527,8 +514,7 @@
       /* the spaceless form (+8801958... / 01863...) also appears in tel:
          links and JSON-LD; swap it too so a phone change never leaves a
          stale number behind. */
-      var spaced = SEED.phone;
-      var bare = SEED.phone.replace(/[^\d+]/g, "");
+      var bare = HTML_DEFAULTS.phone.replace(/[^\d+]/g, "");
       var curBare = (CURRENT.phone || "").replace(/[^\d+]/g, "");
       var newBare = String(s.phone).replace(/[^\d+]/g, "");
       [bare, curBare].forEach(function (oldBare) {
@@ -565,7 +551,7 @@
     /* ---- contact summary line in the topbar ---- */
     var topContact = document.querySelector(".topbar span");
     if (topContact && (s.phone || s.email)) {
-      topContact.innerHTML = "&#128222; " + esc(s.phone || SEED.phone) + " &nbsp;|&nbsp; &#9993; " + esc(s.email || SEED.email);
+      topContact.innerHTML = "&#128222; " + esc(s.phone || "") + " &nbsp;|&nbsp; &#9993; " + esc(s.email || "");
     }
 
     /* ---- footer "Get In Touch" list ---- */
@@ -644,7 +630,7 @@
 
     /* ---- document title / brand text in browser tab ---- */
     if (s.company) {
-      [SEED.company, CURRENT.company].forEach(function (oldName) {
+      [HTML_DEFAULTS.company, CURRENT.company].forEach(function (oldName) {
         if (oldName && oldName !== s.company) document.title = document.title.split(oldName).join(s.company);
       });
     }

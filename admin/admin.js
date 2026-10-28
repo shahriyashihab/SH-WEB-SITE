@@ -1,5 +1,5 @@
-/* =========================================================
-   Shahriar LLC — Admin Panel logic
+﻿/* =========================================================
+   Shahriar LLC â€” Admin Panel logic
    ========================================================= */
 (function () {
   "use strict";
@@ -23,6 +23,17 @@
     e.preventDefault();
     var u = $("lu").value.trim(), p = $("lp").value;
     var admins = SH.list("admins");
+    /* Empty database (fresh template): the first login CREATES the owner
+       account in the cloud. This is how a distributed template becomes
+       usable with no hard-coded credentials. */
+    if (!admins.length) {
+      if (!u || !p) { $("loginErr").textContent = "Choose a username and password to create the owner account."; $("loginErr").style.display = "block"; return; }
+      var owner = { id: "admin-1", username: u, password: p, role: "Owner" };
+      SH.upsert("admins", owner);
+      login(owner); showApp(); $("loginErr").style.display = "none";
+      toast("Owner account created");
+      return;
+    }
     var found = null;
     for (var i = 0; i < admins.length; i++) if (admins[i].username === u && admins[i].password === p) { found = admins[i]; break; }
     if (found) { login(found); showApp(); $("loginErr").style.display = "none"; }
@@ -282,25 +293,10 @@
   }
 
   /* ---------- SUB-SERVICES ---------- */
-  /* Main services the admin can attach a sub-service to. Falls back to the
-     built-in service list so the dropdown is never empty. */
-  var BUILTIN_SERVICES = [
-    { id: "website-design-development", title: "Website Design & Development" },
-    { id: "custom-software-development", title: "Custom Software Development" },
-    { id: "mobile-apps-development", title: "Mobile Apps Development" },
-    { id: "erp-crm-solutions", title: "ERP & CRM Solutions" },
-    { id: "digital-marketing", title: "Digital Marketing" },
-    { id: "it-support-consultancy", title: "IT Support & Consultancy" },
-    { id: "ecommerce-solution", title: "E-commerce Solution" },
-    { id: "hr-payroll-management", title: "HR & Payroll Management" },
-    { id: "pos-retail-software", title: "POS & Retail Software" },
-    { id: "school-management-system", title: "School Management System" },
-    { id: "business-process-outsourcing", title: "Business Process Outsourcing" },
-    { id: "cyber-security", title: "Cyber Security" }
-  ];
+  /* Main services the admin can attach a sub-service to â€” from the store
+     only (cloud). No built-in fallback list. */
   function parentServices() {
-    var live = SH.list("services");
-    return (live && live.length) ? live.map(function (s) { return { id: s.id, title: s.title }; }) : BUILTIN_SERVICES;
+    return (SH.list("services") || []).map(function (s) { return { id: s.id, title: s.title }; });
   }
   function parentTitle(id) {
     var list = parentServices();
@@ -634,14 +630,29 @@
     list.forEach(function (m) { if (m && m.id && !seen[m.id]) { orders.push(m); added = true; } });
     if (added) {
       SH.get().orders = orders;
-      try { localStorage.setItem("shahriar_llc_content_v1", JSON.stringify(SH.get())); } catch (e) {}
+      try { SH.persistLocal(); } catch (e) {}
     }
     renderOrdersList(); refreshCounts(); renderDashboard();
   }
 
   /* ---------- boot ---------- */
-  if (currentUser()) showApp();
-  else { $("loginWrap").style.display = "grid"; }
+  /* A saved session opens the panel straight away. Otherwise wait for the
+     first cloud snapshot (SH.ready) so the admin list is known before we
+     allow login â€” this prevents mistakenly creating an owner account on a
+     database that simply has not loaded yet. */
+  if (currentUser()) { showApp(); }
+  else {
+    $("loginWrap").style.display = "grid";
+    var unlock = function () {
+      var bar = document.getElementById("loginErr");
+      if (bar && !SH.list("admins").length && !bar.textContent) {
+        bar.textContent = "No admin yet â€” type a username and password to create the owner account.";
+        bar.style.display = "block";
+      }
+    };
+    if (window.SH && SH.ready && SH.ready()) unlock();
+    else window.addEventListener("sh:ready", unlock);
+  }
 
   /* ---------- live sync: refresh panel when cloud / another tab changes ---------- */
   window.addEventListener("sh:change", function () {
@@ -673,7 +684,7 @@
         var dup = orders.some(function (x) { return x.id === o.id; });
         if (!dup) {
           orders.push(o);
-          try { localStorage.setItem("shahriar_llc_content_v1", JSON.stringify(SH.get())); } catch (e) {}
+          try { SH.persistLocal(); } catch (e) {}
           toast("\uD83D\uDD14 New order from " + (o.name || "a visitor"));
           if (document.getElementById("page-orders").classList.contains("active")) renderOrdersList();
         }
