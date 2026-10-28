@@ -46,6 +46,7 @@
         company: "",
         subCompany: "",
         tagline: "",
+        about: "",
         topPhone: "",
         topEmail: "",
         phone: "",

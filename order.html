@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -243,7 +243,7 @@
       SH.save();
     }
 
-    /* 2) send to Firebase (cloud â€” visible to admin on any device) */
+    /* 2) send to Firebase (cloud — visible to admin on any device) */
     if (window.SHDB) {
       SHDB.addMessage(order, function (ok) {
         btn.disabled = false; btn.textContent = "Submit Order";

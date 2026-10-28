@@ -1,5 +1,5 @@
-﻿/* =========================================================
-   Shahriar LLC â€” Admin Panel logic
+/* =========================================================
+   Shahriar LLC — Admin Panel logic
    ========================================================= */
 (function () {
   "use strict";
@@ -169,7 +169,7 @@
   }
 
   /* ---------- COMPANY ---------- */
-  var COMPANY_FIELDS = ["company", "subCompany", "tagline", "phone", "email", "address", "facebook", "instagram", "telegram", "linkedin", "youtube"];
+  var COMPANY_FIELDS = ["company", "subCompany", "tagline", "about", "phone", "email", "address", "facebook", "instagram", "telegram", "linkedin", "youtube"];
 
   function fillCompany() {
     var s = SH.get().site;
@@ -293,7 +293,7 @@
   }
 
   /* ---------- SUB-SERVICES ---------- */
-  /* Main services the admin can attach a sub-service to â€” from the store
+  /* Main services the admin can attach a sub-service to — from the store
      only (cloud). No built-in fallback list. */
   function parentServices() {
     return (SH.list("services") || []).map(function (s) { return { id: s.id, title: s.title }; });
@@ -645,7 +645,7 @@
   /* ---------- boot ---------- */
   /* A saved session opens the panel straight away. Otherwise wait for the
      first cloud snapshot (SH.ready) so the admin list is known before we
-     allow login â€” this prevents mistakenly creating an owner account on a
+     allow login — this prevents mistakenly creating an owner account on a
      database that simply has not loaded yet. */
   if (currentUser()) { showApp(); }
   else {
@@ -653,7 +653,7 @@
     var unlock = function () {
       var bar = document.getElementById("loginErr");
       if (bar && !SH.list("admins").length && !bar.textContent) {
-        bar.textContent = "No admin yet â€” type a username and password to create the owner account.";
+        bar.textContent = "No admin yet — type a username and password to create the owner account.";
         bar.style.display = "block";
       }
     };

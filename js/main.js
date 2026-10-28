@@ -175,11 +175,6 @@
       }).join("");
     }
   }
-  function renderTechPage() {
-    if ($("techPageGrid")) {
-      $("techPageGrid").outerHTML = buildMarquee();
-    }
-  }
 
   /* ---------- header / mobile menu ---------- */
   function setupHeader() {
@@ -279,7 +274,6 @@
     renderServicesPage();
     renderPortfolioPage();
     renderClientsPage();
-    renderTechPage();
     setupReveal();
   }
 
@@ -364,17 +358,34 @@
     });
   }
 
-  /* Keep JSON-LD "telephone" values at the live phone number. */
-  function syncSchemaPhone(phone) {
-    if (!phone) return;
-    var dial = String(phone).replace(/[^\d+]/g, "");
+  /* Keep JSON-LD structured data in sync with the live cloud values:
+     telephone, email, organisation name and locality address. */
+  function syncSchemaPhone(site) {
+    site = site || {};
+    var dial = site.phone ? String(site.phone).replace(/[^\d+]/g, "") : "";
+    var email = site.email || "";
+    var company = site.company || "";
+    var locality = site.address || "";
+    if (!dial && !email && !company && !locality) return;
     document.querySelectorAll('script[type="application/ld+json"]').forEach(function (sc) {
       try {
         var obj = JSON.parse(sc.textContent);
         var changed = false;
         (function walk(node) {
           if (!node || typeof node !== "object") return;
-          if (typeof node.telephone === "string") { node.telephone = dial; changed = true; }
+          if (dial && typeof node.telephone === "string") { node.telephone = dial; changed = true; }
+          if (email && typeof node.email === "string") { node.email = email; changed = true; }
+          if (company && typeof node.name === "string" &&
+              /shahriar llc/i.test(node.name)) {
+            node.name = node.name.replace(/Shahriar LLC/gi, company); changed = true;
+          }
+          if (company && typeof node.legalName === "string" &&
+              /shahriar llc/i.test(node.legalName)) {
+            node.legalName = company; changed = true;
+          }
+          if (locality && typeof node.addressLocality === "string") {
+            node.addressLocality = locality; changed = true;
+          }
           Object.keys(node).forEach(function (k) { walk(node[k]); });
         })(obj);
         if (changed) sc.textContent = JSON.stringify(obj);
@@ -471,15 +482,19 @@
     var list = (Array.isArray(slides) ? slides : []).filter(function (sl) { return sl && sl.img; });
 
     /* Cloud is the only source for hero images: when the cloud has no
-       slides, clear the hero (no hard-coded demo picture). */
+       slides, clear the hero and hide the whole card so there is no
+       empty gap (no hard-coded demo picture). */
+    var card = host.closest(".hero-card");
     if (!list.length) {
       if (heroSig !== "__empty__") {
         heroSig = "__empty__";
         if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
         host.innerHTML = "";
       }
+      if (card) card.style.display = "none";
       return;
     }
+    if (card) card.style.display = "";
 
     /* Re-rendering on every sh:change (cloud poll fires every ~8s) would
        reload the images and restart the timer, which looks like a stall/
@@ -535,7 +550,7 @@
         if (oldBare && oldBare !== newBare) replaceText(oldBare, String(s.phone));
       });
       syncTelLinks(s.phone);
-      syncSchemaPhone(s.phone);
+      syncSchemaPhone(s);
     }
 
     /* ---- email: literal text + mailto: links ---- */
@@ -602,15 +617,15 @@
     /* ---- hero ---- */
     /* The hero markup ships EMPTY (data-hero hooks) so the previous
        headline never flashes; we fill it only once cloud data exists. */
-    if (d.hero && document.querySelector(".hero h1")) {
-      var h = d.hero;
+    if (document.querySelector(".hero h1, [data-hero='title']")) {
+      var h = d.hero || {};
       var setH1 = h.title
         ? esc(h.title).replace(/(software company)/i, '<span style="color:var(--accent)">$1</span>').replace(/(Top 1%)/i, '<span style="color:var(--accent)">$1</span>')
         : "";
       document.querySelectorAll('.hero h1, [data-hero="title"]').forEach(function (el) { el.innerHTML = setH1; });
-      /* hero lead paragraph (index uses a bare <p>, older pages use .lead) */
-      document.querySelectorAll('.hero .lead, .hero p, [data-hero="subtitle"]').forEach(function (el) {
-        if (el.closest(".hero-badges") || el.closest(".hero-cta")) return;
+      /* hero lead paragraph: only the explicit subtitle hook / .lead
+         (avoids wiping any other <p> that might live inside the hero) */
+      document.querySelectorAll('.hero .lead, [data-hero="subtitle"]').forEach(function (el) {
         el.textContent = h.subtitle || "";
       });
       var stats = ["1", "2", "3"].map(function (n) {
@@ -618,8 +633,12 @@
         if (!num && !lbl) return "";
         return '<div><strong>' + esc(num) + '</strong><span>' + esc(lbl) + '</span></div>';
       }).join("");
-      document.querySelectorAll(".hero-badges").forEach(function (wrap) { wrap.innerHTML = stats; });
-      /* badge pill (may not exist on every hero) */
+      document.querySelectorAll(".hero-badges").forEach(function (wrap) {
+        wrap.innerHTML = stats;
+        wrap.style.display = stats ? "" : "none";
+      });
+      /* badge pill: hide entirely when the cloud has no badge so no
+         empty pill / bare dot is shown */
       document.querySelectorAll(".hero .badge-pill, .hero .hero-badge").forEach(function (badge) {
         badge.style.display = h.badge ? "" : "none";
         if (h.badge) badge.innerHTML = '<span class="dot"></span>' + esc(h.badge);
