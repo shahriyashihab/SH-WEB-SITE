@@ -627,15 +627,26 @@
     }
 
     /* ---- tagline (footer brand line) ---- */
-    if (s.tagline) {
-      document.querySelectorAll(".footer-tagline").forEach(function (el) { el.textContent = s.tagline; });
-    }
+    document.querySelectorAll(".footer-tagline, [data-sh-tagline]").forEach(function (el) {
+      el.textContent = s.tagline || "";
+    });
 
-    /* ---- footer copyright: show company + sub-company ---- */
+    /* ---- brand text: logo alt, footer brand, copyright ---- */
+    var co = (s.company || "") + (s.subCompany ? " " + s.subCompany : "");
+    document.querySelectorAll('[data-sh-company]').forEach(function (el) { el.textContent = s.company || ""; });
+    document.querySelectorAll('[data-sh-address]').forEach(function (el) { el.textContent = s.address || ""; });
+    document.querySelectorAll('img[alt=""]').forEach(function (im) {
+      if (/logo/i.test(im.getAttribute("src") || "")) im.setAttribute("alt", s.company || "");
+    });
+    /* footer brand paragraph = company description from the cloud.
+       When the cloud has none, hide it entirely (no hardcoded text). */
+    document.querySelectorAll('[data-sh-about]').forEach(function (el) {
+      if (s.about) { el.textContent = s.about; el.style.display = ""; }
+      else { el.textContent = ""; el.style.display = "none"; }
+    });
     if (s.company) {
-      var co = s.company + (s.subCompany ? " " + s.subCompany : "");
-      document.querySelectorAll(".footer-bottom span").forEach(function (el) {
-        if (/all rights reserved/i.test(el.textContent)) {
+      document.querySelectorAll(".footer-bottom span, [data-sh-copyright]").forEach(function (el) {
+        if (el.hasAttribute("data-sh-copyright") || /all rights reserved/i.test(el.textContent)) {
           el.innerHTML = "&copy; " + new Date().getFullYear() + " " + esc(co) + ". All rights reserved.";
         }
       });
