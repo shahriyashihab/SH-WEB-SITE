@@ -179,7 +179,9 @@
   function renderServicesPage() { if ($("allServices")) $("allServices").innerHTML = servicesData().map(svcCard).join(""); }
   function renderPortfolioPage() {
     if ($("pfGrid")) {
-      $("pfGrid").innerHTML = PORTFOLIO.map(function (p, i) {
+      var items = (window.SH && SH.list("portfolio").length) ? SH.list("portfolio")
+        : [{ cat: "ERP", t: "Enterprise Resource Planning", d: "Full ERP with inventory, accounts, HR and reporting for a manufacturing group." }];
+      $("pfGrid").innerHTML = items.map(function (p, i) {
         return '<article class="pf-card reveal" style="--d:' + ((i % 3) * 110) + 'ms"><div class="pf-thumb">' + esc(p.cat) + '</div>' +
           '<div class="pf-body"><span class="cat">' + esc(p.cat) + '</span>' +
           '<h3>' + esc(p.t) + '</h3><p>' + esc(p.d) + '</p></div></article>';

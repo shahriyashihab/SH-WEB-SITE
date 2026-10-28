@@ -46,7 +46,7 @@
   }
 
   /* ---------- navigation ---------- */
-  var PAGES = { dashboard: "Dashboard", company: "Company Settings", hero: "Home / Hero", services: "Services", subservices: "Sub-Services", products: "Products", team: "Management Team", ceo: "CEO Profile", slides: "Slide Bar", admins: "Admin Users", orders: "Orders / Leads" };
+  var PAGES = { dashboard: "Dashboard", company: "Company Settings", hero: "Home / Hero", services: "Services", subservices: "Sub-Services", products: "Products", portfolio: "Portfolio", team: "Management Team", ceo: "CEO Profile", slides: "Slide Bar", admins: "Admin Users", orders: "Orders / Leads" };
   function showPage(page) {
     document.querySelectorAll(".sb-link").forEach(function (l) { l.classList.toggle("active", l.getAttribute("data-page") === page); });
     document.querySelectorAll(".page").forEach(function (p) { p.classList.toggle("active", p.id === "page-" + page); });
@@ -56,6 +56,7 @@
     if (page === "services") renderServicesList();
     if (page === "subservices") renderSubServicesList();
     if (page === "products") renderProductsList();
+    if (page === "portfolio") renderPortfolioList();
     if (page === "slides") renderSlidesList();
     if (page === "team") renderTeamList();
     if (page === "admins") renderAdminsList();
@@ -91,6 +92,7 @@
     $("cServices").textContent = SH.list("services").length;
     if ($("cSub")) $("cSub").textContent = SH.list("subservices").length;
     if ($("cSlides")) $("cSlides").textContent = SH.list("slides").length;
+    if ($("cPortfolio")) $("cPortfolio").textContent = SH.list("portfolio").length;
     $("cProducts").textContent = SH.list("products").length;
     $("cTeam").textContent = SH.list("team").length;
     $("cAdmins").textContent = SH.list("admins").length;
@@ -414,6 +416,36 @@
     }, 30);
   }
 
+  /* ---------- PORTFOLIO ---------- */
+  function renderPortfolioList() {
+    var list = SH.list("portfolio");
+    if (!list.length) { $("portfolioList").innerHTML = '<p class="empty">No projects yet. Click "Add Project".</p>'; return; }
+    $("portfolioList").innerHTML = list.map(function (p) {
+      return '<div class="row-item">' +
+        '<div class="info"><b>' + esc(p.t || "Project") + '</b><span>' + esc(p.cat || "") + ' &bull; ' + esc((p.d || "").slice(0, 80)) + '</span></div>' +
+        '<div class="row-actions"><button class="btn btn-outline btn-sm" data-edit-pf="' + p.id + '">Edit</button>' +
+        '<button class="btn btn-danger btn-sm" data-del-pf="' + p.id + '">Delete</button></div></div>';
+    }).join("");
+    document.querySelectorAll("[data-edit-pf]").forEach(function (b) { b.addEventListener("click", function () { openPortfolioModal(b.getAttribute("data-edit-pf")); }); });
+    document.querySelectorAll("[data-del-pf]").forEach(function (b) {
+      b.addEventListener("click", function () { if (confirm("Delete this project?")) { SH.remove("portfolio", b.getAttribute("data-del-pf")); renderPortfolioList(); refreshCounts(); toast("Project deleted"); } });
+    });
+  }
+  $("addPortfolio").addEventListener("click", function () { openPortfolioModal(null); });
+
+  function openPortfolioModal(id) {
+    var p = id ? SH.getItem("portfolio", id) : { cat: "", t: "", d: "" };
+    var html =
+      '<div class="form-grid two"><div class="fld"><label>Category</label><input id="pfCat" value="' + esc(p.cat || "") + '"></div>' +
+      '<div class="fld"><label>Title</label><input id="pfTitle" value="' + esc(p.t || "") + '"></div></div>' +
+      '<div class="fld"><label>Description</label><textarea id="pfDesc">' + esc(p.d || "") + '</textarea></div>';
+    openModal(id ? "Edit Project" : "Add Project", html, function () {
+      var obj = { id: id || undefined, cat: $("pfCat").value.trim(), t: $("pfTitle").value.trim(), d: $("pfDesc").value.trim() };
+      if (!obj.t) { toast("Title is required"); return; }
+      SH.upsert("portfolio", obj); closeModal(); renderPortfolioList(); refreshCounts(); toast("Project saved");
+    });
+  }
+
   /* ---------- PRODUCTS ---------- */
   function renderProductsList() {    var list = SH.list("products");
     if (!list.length) { $("productsList").innerHTML = '<p class="empty">No products yet. Click "Add Product".</p>'; return; }
@@ -622,6 +654,7 @@
       if (page === "services") renderServicesList();
       if (page === "subservices") renderSubServicesList();
       if (page === "products") renderProductsList();
+      if (page === "portfolio") renderPortfolioList();
       if (page === "slides") renderSlidesList();
       if (page === "team") renderTeamList();
       if (page === "admins") renderAdminsList();
