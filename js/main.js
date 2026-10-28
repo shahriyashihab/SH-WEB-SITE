@@ -562,20 +562,28 @@
       if (url && url !== "#") { a.setAttribute("href", url); a.setAttribute("target", "_blank"); a.setAttribute("rel", "noopener"); }
     });
 
-    /* ---- contact summary line in the topbar ---- */
-    var topContact = document.querySelector(".topbar span");
-    if (topContact && (s.phone || s.email)) {
-      topContact.innerHTML = "&#128222; " + esc(s.phone || "") + " &nbsp;|&nbsp; &#9993; " + esc(s.email || "");
-    }
+    /* ---- contact summary line in the topbar ----
+       The markup ships EMPTY (data-sh-top) so a stale number never flashes
+       before the cloud data arrives; we fill it here from the live value. */
+    document.querySelectorAll(".topbar span, [data-sh-top]").forEach(function (tc) {
+      tc.innerHTML = "&#128222; " + esc(s.phone || "") + " &nbsp;|&nbsp; &#9993; " + esc(s.email || "");
+    });
 
     /* ---- footer "Get In Touch" list ---- */
+    document.querySelectorAll("[data-sh-foot]").forEach(function (li) {
+      var k = li.getAttribute("data-sh-foot");
+      if (k === "phone" && s.phone) li.innerHTML = "&#128222; " + esc(s.phone);
+      else if (k === "email" && s.email) li.innerHTML = "&#9993; " + esc(s.email);
+      else if (k === "address" && s.address) li.innerHTML = "&#127968; " + esc(s.address);
+    });
+    /* legacy footers whose <li>s are not tagged yet */
     document.querySelectorAll(".footer-links").forEach(function (ul) {
       var head = ul.previousElementSibling;
       if (!head || (head.textContent || "").trim().toLowerCase() !== "get in touch") return;
       var lis = ul.querySelectorAll("li");
-      if (lis[0] && s.phone) lis[0].innerHTML = "&#128222; " + esc(s.phone);
-      if (lis[1] && s.email) lis[1].innerHTML = "&#9993; " + esc(s.email);
-      if (lis[2] && s.address) lis[2].innerHTML = "&#127968; " + esc(s.address);
+      if (lis[0] && !lis[0].getAttribute("data-sh-foot") && s.phone) lis[0].innerHTML = "&#128222; " + esc(s.phone);
+      if (lis[1] && !lis[1].getAttribute("data-sh-foot") && s.email) lis[1].innerHTML = "&#9993; " + esc(s.email);
+      if (lis[2] && !lis[2].getAttribute("data-sh-foot") && s.address) lis[2].innerHTML = "&#127968; " + esc(s.address);
     });
 
     /* ---- contact / order page info cards ---- */
@@ -592,23 +600,28 @@
     syncDataAttrs(s);
 
     /* ---- hero ---- */
+    /* The hero markup ships EMPTY (data-hero hooks) so the previous
+       headline never flashes; we fill it only once cloud data exists. */
     if (d.hero && document.querySelector(".hero h1")) {
       var h = d.hero;
-      document.querySelectorAll(".hero h1").forEach(function (el) {
-        if (h.title) el.innerHTML = esc(h.title).replace(/(software company)/i, '<span style="color:var(--accent)">$1</span>').replace(/(Top 1%)/i, '<span style="color:var(--accent)">$1</span>');
-      });
+      var setH1 = h.title
+        ? esc(h.title).replace(/(software company)/i, '<span style="color:var(--accent)">$1</span>').replace(/(Top 1%)/i, '<span style="color:var(--accent)">$1</span>')
+        : "";
+      document.querySelectorAll('.hero h1, [data-hero="title"]').forEach(function (el) { el.innerHTML = setH1; });
       /* hero lead paragraph (index uses a bare <p>, older pages use .lead) */
-      document.querySelectorAll(".hero .lead, .hero p").forEach(function (el) {
+      document.querySelectorAll('.hero .lead, .hero p, [data-hero="subtitle"]').forEach(function (el) {
         if (el.closest(".hero-badges") || el.closest(".hero-cta")) return;
-        if (h.subtitle) el.textContent = h.subtitle;
+        el.textContent = h.subtitle || "";
       });
-      document.querySelectorAll(".hero-badges").forEach(function (wrap) {
-        wrap.innerHTML = '<div><strong>' + esc(h.stat1n || "") + '</strong><span>' + esc(h.stat1l || "") + '</span></div>' +
-          '<div><strong>' + esc(h.stat2n || "") + '</strong><span>' + esc(h.stat2l || "") + '</span></div>' +
-          '<div><strong>' + esc(h.stat3n || "") + '</strong><span>' + esc(h.stat3l || "") + '</span></div>';
-      });
+      var stats = ["1", "2", "3"].map(function (n) {
+        var num = h["stat" + n + "n"] || "", lbl = h["stat" + n + "l"] || "";
+        if (!num && !lbl) return "";
+        return '<div><strong>' + esc(num) + '</strong><span>' + esc(lbl) + '</span></div>';
+      }).join("");
+      document.querySelectorAll(".hero-badges").forEach(function (wrap) { wrap.innerHTML = stats; });
       /* badge pill (may not exist on every hero) */
       document.querySelectorAll(".hero .badge-pill, .hero .hero-badge").forEach(function (badge) {
+        badge.style.display = h.badge ? "" : "none";
         if (h.badge) badge.innerHTML = '<span class="dot"></span>' + esc(h.badge);
       });
     }
