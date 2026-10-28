@@ -22,12 +22,12 @@
   function icon(n) { return ICONS[n] || ICONS.code; }
 
   var PRODUCTS = [
-    { name: "Sheba ERP", tag: "Best ERP Software in Bangladesh", img: "img/prod-erp.jpg", logo: "ERP", slug: "sheba-erp" },
-    { name: "HR Sheba", tag: "Best HR & Payroll Software", img: "img/prod-hr.jpg", logo: "HR", slug: "hr-sheba" },
-    { name: "Smart Educare", tag: "Best School Management System", img: "img/prod-school.jpg", logo: "EDU", slug: "smart-educare" },
-    { name: "Gym Master", tag: "Best Gym Management Software", img: "img/prod-gym.jpg", logo: "GYM", slug: "gym-master" },
-    { name: "CRM Suite", tag: "Best CRM Software in Bangladesh", img: "img/prod-crm.jpg", logo: "CRM", slug: "crm-suite" },
-    { name: "Remit Sheba", tag: "Best Remittance Management System", img: "img/prod-remit.jpg", logo: "RMS", slug: "remit-sheba" }
+    { name: "Sheba ERP", tag: "Best ERP Software in Bangladesh", img: "assets/img/prod-erp.jpg", logo: "ERP", slug: "sheba-erp" },
+    { name: "HR Sheba", tag: "Best HR & Payroll Software", img: "assets/img/prod-hr.jpg", logo: "HR", slug: "hr-sheba" },
+    { name: "Smart Educare", tag: "Best School Management System", img: "assets/img/prod-school.jpg", logo: "EDU", slug: "smart-educare" },
+    { name: "Gym Master", tag: "Best Gym Management Software", img: "assets/img/prod-gym.jpg", logo: "GYM", slug: "gym-master" },
+    { name: "CRM Suite", tag: "Best CRM Software in Bangladesh", img: "assets/img/prod-crm.jpg", logo: "CRM", slug: "crm-suite" },
+    { name: "Remit Sheba", tag: "Best Remittance Management System", img: "assets/img/prod-remit.jpg", logo: "RMS", slug: "remit-sheba" }
   ];
 
   /* ---------- tech marquee builder (two rows, opposite directions) ---------- */
@@ -54,18 +54,18 @@
   }
   /* [title, icon, image, color, slug] */
   var SERVICE_LIST = [
-    ["Website Design & Development", "code", "img/svc-web.jpg", "blue", "website-design-development"],
-    ["Custom Software Development", "code", "img/svc-software.jpg", "cyan", "custom-software-development"],
-    ["Mobile Apps Development", "phone", "img/svc-mobile.jpg", "orange", "mobile-apps-development"],
-    ["ERP & CRM Solutions", "erp", "img/svc-erp.jpg", "purple", "erp-crm-solutions"],
-    ["Digital Marketing", "cloud", "img/svc-marketing.jpg", "green", "digital-marketing"],
-    ["IT Support & Consultancy", "shield", "img/svc-support.jpg", "blue", "it-support-consultancy"],
-    ["E-commerce Solution", "cart", "img/svc-web.jpg", "cyan", "ecommerce-solution"],
-    ["HR & Payroll Management", "users", "img/svc-erp.jpg", "orange", "hr-payroll-management"],
-    ["POS & Retail Software", "pos", "img/svc-software.jpg", "purple", "pos-retail-software"],
-    ["School Management System", "school", "img/svc-support.jpg", "green", "school-management-system"],
-    ["Business Process Outsourcing", "cloud", "img/svc-marketing.jpg", "blue", "business-process-outsourcing"],
-    ["Cyber Security", "shield", "img/svc-software.jpg", "cyan", "cyber-security"]
+    ["Website Design & Development", "code", "assets/img/svc-web.jpg", "blue", "website-design-development"],
+    ["Custom Software Development", "code", "assets/img/svc-software.jpg", "cyan", "custom-software-development"],
+    ["Mobile Apps Development", "phone", "assets/img/svc-mobile.jpg", "orange", "mobile-apps-development"],
+    ["ERP & CRM Solutions", "erp", "assets/img/svc-erp.jpg", "purple", "erp-crm-solutions"],
+    ["Digital Marketing", "cloud", "assets/img/svc-marketing.jpg", "green", "digital-marketing"],
+    ["IT Support & Consultancy", "shield", "assets/img/svc-support.jpg", "blue", "it-support-consultancy"],
+    ["E-commerce Solution", "cart", "assets/img/svc-web.jpg", "cyan", "ecommerce-solution"],
+    ["HR & Payroll Management", "users", "assets/img/svc-erp.jpg", "orange", "hr-payroll-management"],
+    ["POS & Retail Software", "pos", "assets/img/svc-software.jpg", "purple", "pos-retail-software"],
+    ["School Management System", "school", "assets/img/svc-support.jpg", "green", "school-management-system"],
+    ["Business Process Outsourcing", "cloud", "assets/img/svc-marketing.jpg", "blue", "business-process-outsourcing"],
+    ["Cyber Security", "shield", "assets/img/svc-software.jpg", "cyan", "cyber-security"]
   ];
   var INDUSTRIES = ["Government Sector", "Private Sector", "Education Sector", "Offshore Client", "RMG Sector", "Healthcare", "Banking & Finance", "Retail & Super Shop", "Real Estate", "NGO & Development", "ISP & Telecom", "Hospitality & Travel"];
   var TECH = ["PHP / Laravel", "CodeIgniter", "Node.js", "React", "Vue.js", "Next.js", "Flutter", "Android (Kotlin)", "iOS (Swift)", "Python / Django", "ASP.NET", "MySQL", "PostgreSQL", "MongoDB", "AWS", "Docker"];
@@ -127,7 +127,7 @@
     var delay = (i % 3) * 110;
     var slug = s[4] || "";
     var link = slug ? "service?item=" + encodeURIComponent(slug) : "services";
-    var img = s[2] || "img/svc-web.jpg";
+    var img = s[2] || "assets/img/svc-web.jpg";
     var src = /^(assets\/|data:|http)/.test(img) ? img : ("assets/" + img);
     return '<article class="service-card reveal" style="--d:' + delay + 'ms">' +
       '<div class="sc-img"><img src="' + esc(src) + '" alt="' + esc(s[0]) + '" loading="lazy" /></div>' +
