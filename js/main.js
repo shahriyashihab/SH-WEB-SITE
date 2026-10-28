@@ -469,18 +469,32 @@
      The container keeps the exact same box as the old single image.
      With 0 or 1 slide it just shows that image (no timer). */
   var heroTimer = null;
+  var heroSig = "";              /* signature of the currently rendered slides */
   function renderHeroSlider(slides) {
     var host = document.getElementById("heroSlider");
     if (!host) return;
-    if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
     var list = (slides || []).filter(function (sl) { return sl && sl.img; });
-    /* No slides configured yet: keep whatever static image is already in
-       the markup so the hero picture never disappears. */
+
+    /* Nothing configured yet: keep whatever static image is in the markup. */
     if (!list.length) return;
+
+    /* Re-rendering on every sh:change (cloud poll fires every ~8s) would
+       reload the images and restart the timer, which looks like a stall/
+       flicker. Only rebuild when the slide list actually changed. */
+    var sig = list.map(function (sl) { return sl.id + "|" + sl.img; }).join("~");
+    if (sig === heroSig && host.querySelector(".hero-slide")) return;
+    heroSig = sig;
+
+    if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
+    var old = host.querySelectorAll(".hero-slide");
+    var oldActive = -1;
+    if (old.length) {
+      for (var k = 0; k < old.length; k++) if (old[k].classList.contains("is-active")) { oldActive = k; break; }
+    }
 
     host.innerHTML = list.map(function (sl, i) {
       return '<img class="hero-slide' + (i === 0 ? " is-active" : "") + '" src="' + esc(imgSrc(sl.img)) + '" alt="' + esc(sl.alt || "") + '"' +
-        (i === 0 ? "" : ' loading="lazy"') + ' />';
+        (i === 0 ? ' fetchpriority="high"' : '') + ' decoding="async" />';
     }).join("");
 
     if (list.length < 2) return;   /* single image: nothing to slide */
